@@ -1,4 +1,14 @@
 {
+  "ao-nela": {
+    "version": "v1.0",
+    "promptFile": "prompts/ao-nela.v1.md",
+    "model": "gpt-4.1-mini",
+    "temperature": 0.2,
+    "public": {
+      "name": "Nela – Anglictina Opava",
+      "brandColor": "#ff9800"
+    }
+  },
   "lukas-math": {
     "version": "v1.0",
     "promptFile": "prompts/lukas-math.v1.md",
