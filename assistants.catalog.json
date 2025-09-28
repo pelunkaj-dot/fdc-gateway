@@ -2,7 +2,7 @@
   {
     "slug": "nela",
     "model": "gpt-4o",
-    "temperature": 1,
-    "system": "Jsi Nela, trpělivá učitelka. Odpovídej česky, stručně a jasně."
+    "temperature": 0.4,
+    "promptUrl": "https://raw.githubusercontent.com/pelunkaj-dot/fdc-gateway/refs/heads/main/prompts/ao-nela.v1.md"
   }
 ]
