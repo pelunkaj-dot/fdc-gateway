@@ -1,40 +1,56 @@
-// Vercel serverless: /api/chat
+const fs = require("fs");
+const path = require("path");
+
+// --- helpers ---
+function loadCatalog() {
+  const p = path.join(process.cwd(), "assistants.catalog.json");
+  return JSON.parse(fs.readFileSync(p, "utf8"));
+}
+function loadPrompt(promptFile) {
+  const p = path.join(process.cwd(), promptFile);
+  return fs.readFileSync(p, "utf8");
+}
+
+// --- Vercel serverless: /api/chat ---
 export default async function handler(req, res) {
-  // CORS
+  // CORS (muzes pozdeji zprisnit whitelistem)
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   try {
-    const { message, session_id, assistant } = req.body || {};
+    // vstup z bubliny (tolerujeme ruzne nazvy)
+    const {
+      message,
+      session_id,
+      sessionId: sessionIdAlt,
+      assistant,
+      assistantId: assistantIdAlt
+    } = req.body || {};
+
     if (!message) return res.status(400).json({ error: "Missing 'message'" });
 
-    // Prompty per bublina/lektorka podle ID z fdc.setup({ id: "…" })
-    const prompts = {
-      "test-ao": `
-Jsi Nela, laskavá a praktická lektorka angličtiny pro web Angličtina Opava.
-Mluv česky, odpovědi drž stručné (3–6 vět), ukaž jeden konkrétní příklad.
-Když si nejsi jistá, zeptej se krátce na upřesnění. Nepiš smyšlené zdroje.
-Témata: slovní zásoba, gramatika, výslovnost, tipy na učení, krátká cvičení.
-`,
-      // sem můžeš později přidat další lektory, např.:
-      "adele-a1": `
-Jsi Adele, trpělivá lektorka pro úroveň A1. Vysvětluj extra jednoduše, používej češtinu a mini-příklady.
-`,
-      "ao-nela": `
-Jsi Nela pro Angličtina Opava. Buď svižná, přátelská, věcná. Každou odpověď zakonči malým úkolem na 1 minutu.
-`
-    };
+    const sessionId = session_id || sessionIdAlt || null;
+    const assistantId = assistant || assistantIdAlt;
 
-    const defaultPrompt = `
-Jsi Nela, přátelská lektorka. Odpovídej česky, stručně a prakticky. Když něco chybí, zeptej se.
-`;
+    if (!assistantId) {
+      return res.status(400).json({ code: "MISSING_ASSISTANT", message: "Chybi assistantId" });
+    }
 
-    const systemPrompt = prompts[assistant] || defaultPrompt;
+    // katalog + prompt
+    const catalog = loadCatalog();
+    const cfg = catalog[assistantId];
+    if (!cfg) {
+      return res.status(400).json({ code: "UNKNOWN_ASSISTANT", message: `Neznamy assistantId: ${assistantId}` });
+    }
 
+    const systemPrompt = loadPrompt(cfg.promptFile);
+    const model = cfg.model || "gpt-4.1-mini";
+    const temperature = cfg.temperature ?? 0.2;
+
+    // volani OpenAI
     const resp = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -42,10 +58,10 @@ Jsi Nela, přátelská lektorka. Odpovídej česky, stručně a prakticky. Když
         "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
       },
       body: JSON.stringify({
-        model: "gpt-3.5-turbo",
-        temperature: 0.7,
+        model,
+        temperature,
         messages: [
-          { role: "system", content: systemPrompt.trim() },
+          { role: "system", content: systemPrompt },
           { role: "user", content: message }
         ]
       })
@@ -54,13 +70,17 @@ Jsi Nela, přátelská lektorka. Odpovídej česky, stručně a prakticky. Když
     const data = await resp.json();
     if (!resp.ok) {
       console.error("OpenAI error:", data);
-      return res.status(500).json({ error: "OpenAI error", detail: data });
+      return res.status(502).json({ code: "OPENAI_ERROR", detail: data });
     }
 
-    const reply = data.choices?.[0]?.message?.content || "";
-    return res.status(200).json({ reply, session_id: session_id || null, assistant: assistant || null });
+    const reply = data?.choices?.[0]?.message?.content ?? "";
+    return res.status(200).json({
+      reply,
+      session_id: sessionId,
+      assistant: assistantId
+    });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ error: "Server error" });
+    return res.status(500).json({ code: "SERVER_ERROR", message: "Necekana chyba" });
   }
 }
