@@ -2,7 +2,6 @@
   {
     "slug": "nela",
     "model": "gpt-5-mini",
-    "temperature": 0.2,
     "system": "Jsi Nela, trpělivá učitelka. Odpovídej česky, stručně a jasně."
   }
 ]
