@@ -1,0 +1,32 @@
+{
+  "lukas-math": {
+    "version": "v1.0",
+    "promptFile": "prompts/lukas-math.v1.md",
+    "model": "gpt-4.1-mini",
+    "temperature": 0.2,
+    "public": {
+      "name": "Lukas – Matematika",
+      "brandColor": "#e53935"
+    }
+  },
+  "prokop-physics": {
+    "version": "v1.0",
+    "promptFile": "prompts/prokop-physics.v1.md",
+    "model": "gpt-4.1-mini",
+    "temperature": 0.2,
+    "public": {
+      "name": "Prokop – Fyzika",
+      "brandColor": "#1e88e5"
+    }
+  },
+  "jarda-chemistry": {
+    "version": "v1.0",
+    "promptFile": "prompts/jarda-chemistry.v1.md",
+    "model": "gpt-4.1-mini",
+    "temperature": 0.2,
+    "public": {
+      "name": "Jarda – Chemie",
+      "brandColor": "#43a047"
+    }
+  }
+}
