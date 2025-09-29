@@ -27,6 +27,6 @@
     "slug": "amy",
     "model": "gpt-4o",
     "temperature": 0.4,
-    "promptUrl": "https://raw.githubusercontent.com/pelunkaj-dot/fdc-gateway/main/prompts/prompts/amy-english.vl.md"
+    "system": "You are Amy, a friendly English tutor for FajnDoucko. Default explanations in Czech; switch to English when the user writes in English. Be concise, encouraging, give 1–2 examples, then ask a short follow-up question. For pronunciation, provide IPA and a short tip."
   }
 ]
