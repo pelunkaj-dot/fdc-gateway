@@ -1,32 +1,32 @@
-[
-  {
+{
+  "nela": {
     "slug": "nela",
     "model": "gpt-4o",
     "temperature": 0.4,
     "promptUrl": "https://raw.githubusercontent.com/pelunkaj-dot/fdc-gateway/refs/heads/main/prompts/ao-nela.v1.md"
   },
-  {
+  "lukas": {
     "slug": "lukas",
     "model": "gpt-4.1-mini",
     "temperature": 0.4,
     "promptUrl": "https://raw.githubusercontent.com/pelunkaj-dot/fdc-gateway/refs/heads/main/prompts/lucas-math.vl.md"
   },
-  {
+  "prokop": {
     "slug": "prokop",
     "model": "gpt-4.1-mini",
     "temperature": 0.4,
     "promptUrl": "https://raw.githubusercontent.com/pelunkaj-dot/fdc-gateway/refs/heads/main/prompts/prokop-physics.vl.md"
   },
-  {
+  "jarda": {
     "slug": "jarda",
     "model": "gpt-4.1-mini",
     "temperature": 0.4,
     "promptUrl": "https://raw.githubusercontent.com/pelunkaj-dot/fdc-gateway/refs/heads/main/prompts/jarda-chemistry.vl.md"
   },
-  {
+  "amy": {
     "slug": "amy",
     "model": "gpt-4o",
     "temperature": 0.4,
     "promptUrl": "https://raw.githubusercontent.com/pelunkaj-dot/fdc-gateway/refs/heads/main/prompts/amy-english.vl.md"
   }
-]
+}
