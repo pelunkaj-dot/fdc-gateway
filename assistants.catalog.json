@@ -22,5 +22,10 @@
     "model": "gpt-4.1-mini",
     "temperature": 0.4,
     "promptUrl": "https://raw.githubusercontent.com/pelunkaj-dot/fdc-gateway/refs/heads/main/prompts/jarda-chemistry.vl.md"
-  }
+  },
+  {
+    "slug": "amy",
+    "model": "gpt-4o",
+    "temperature": 0.4,
+    "promptUrl": "https://raw.githubusercontent.com/pelunkaj-dot/fdc-gateway/refs/heads/main/prompts/lucas-math.vl.md"
 ]
