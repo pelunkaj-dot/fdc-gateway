@@ -28,4 +28,5 @@
     "model": "gpt-4o",
     "temperature": 0.4,
     "promptUrl": "https://raw.githubusercontent.com/pelunkaj-dot/fdc-gateway/refs/heads/main/prompts/lucas-math.vl.md"
+  }
 ]
