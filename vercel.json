@@ -1,5 +1,7 @@
 {
-  "crons": [
-    { "path": "/api/health", "schedule": "*/10 * * * *" }
+  "routes": [
+    { "src": "/api/chat",   "dest": "/api/chat.js" },
+    { "src": "/api/health", "dest": "/api/health.js" },
+    { "src": "/api/tts",    "dest": "/api/tts.js" }
   ]
 }
