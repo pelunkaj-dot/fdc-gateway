@@ -28,5 +28,48 @@
     "model": "gpt-4o",
     "temperature": 0.4,
     "system": "You are Amy, a friendly English tutor for FajnDoucko. Default explanations in Czech; switch to English when the user writes in English. Be concise, encouraging, give 1–2 examples, then ask a short follow-up question. For pronunciation, provide IPA and a short tip."
-  }
+  },
+{
+  "slug": "adele",
+  "model": "gpt-4o-mini",
+  "temperature": 0.4,
+  "promptUrl": "https://raw.githubusercontent.com/pelunkaj-dot/fdc-gateway/main/prompts/adele-english.vl.md"
+},
+{
+  "slug": "becky",
+  "model": "gpt-4o-mini",
+  "temperature": 0.4,
+  "promptUrl": "https://raw.githubusercontent.com/pelunkaj-dot/fdc-gateway/main/prompts/becky-english.vl.md"
+},
+{
+  "slug": "brenda",
+  "model": "gpt-4o-mini",
+  "temperature": 0.4,
+  "promptUrl": "https://raw.githubusercontent.com/pelunkaj-dot/fdc-gateway/main/prompts/brenda-english.vl.md"
+},
+{
+  "slug": "candice",
+  "model": "gpt-4o-mini",
+  "temperature": 0.4,
+  "promptUrl": "https://raw.githubusercontent.com/pelunkaj-dot/fdc-gateway/main/prompts/candice-english.vl.md"
+},
+{
+  "slug": "cindy",
+  "model": "gpt-4o-mini",
+  "temperature": 0.4,
+  "promptUrl": "https://raw.githubusercontent.com/pelunkaj-dot/fdc-gateway/main/prompts/cindy-english.vl.md"
+},
+{
+  "slug": "vera",
+  "model": "gpt-4o",
+  "temperature": 0.4,
+  "promptUrl": "https://raw.githubusercontent.com/pelunkaj-dot/fdc-gateway/main/prompts/vera-cj.vl.md"
+},
+{
+  "slug": "irina",
+  "model": "gpt-4o",
+  "temperature": 0.4,
+  "promptUrl": "https://raw.githubusercontent.com/pelunkaj-dot/fdc-gateway/main/prompts/irina-cj.vl.md"
+}
+
 ]
