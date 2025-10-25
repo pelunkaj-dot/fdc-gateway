@@ -1,11 +1,10 @@
 // /api/realtime-token.js
 export default async function handler(req, res) {
-  // --- CORS (povolení pro fajndoucko.cz) ---
+  // --- CORS ---
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   if (req.method === "OPTIONS") return res.status(204).end();
-  // -----------------------------------------
 
   try {
     if (req.method !== "GET") {
@@ -20,14 +19,12 @@ export default async function handler(req, res) {
     const model = REALTIME_MODEL || "gpt-4o-realtime-preview";
     const voice = REALTIME_VOICE || "alloy";
 
-    // >>> ZDE JE PERSONA AMY PRO HLASOVÝ KANÁL <<<
     const instructions = [
       "You are Amy — a friendly FEMALE English tutor (level A2) for Czech students.",
-      "Always speak with a FEMALE voice. Mirror the user's language: Czech ↔ English.",
-      "If the user speaks Czech, answer briefly in Czech but include simple English examples.",
-      "Speak at a moderate pace (not fast), short sentences, clear articulation.",
+      "Mirror the user's language (Czech ↔ English).",
+      "Speak at a moderate pace in short sentences, clearly.",
       "Always produce TEXT alongside speech (for transcripts).",
-      "Be warm, encouraging, and concise."
+      "Be warm, encouraging, concise."
     ].join(" ");
 
     const r = await fetch("https://api.openai.com/v1/realtime/sessions", {
@@ -39,11 +36,12 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model,
         voice,
-        instructions,                 // <<< persona Amy
+        instructions,
         modalities: ["text", "audio"],
         input_audio_format: "pcm16",
-        turn_detection: { type: "server_vad" } // automaticky ukončí větu
-        // Pozn.: jazykovou detekci dělá model sám („mirror-user“).
+        // Vynutíme transkripce jako eventy:
+        input_transcription: { enabled: true, language: "auto" },
+        turn_detection: { type: "server_vad" }
       }),
     });
 
@@ -58,10 +56,7 @@ export default async function handler(req, res) {
       expires_at: data?.expires_at,
       model,
       voice,
-      policies: {
-        reply_language: "mirror-user",
-        force_gender_voice: "female"
-      }
+      policies: { reply_language: "mirror-user", force_gender_voice: "female" }
     });
   } catch (e) {
     console.error(e);
