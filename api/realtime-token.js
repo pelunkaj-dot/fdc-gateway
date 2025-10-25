@@ -1,5 +1,14 @@
 // /api/realtime-token.js
 export default async function handler(req, res) {
+  // --- CORS (povolit volání z jiné domény, např. fajndoucko.cz) ---
+  res.setHeader("Access-Control-Allow-Origin", "*"); // pro jednoduchost; později můžeme zúžit
+  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (req.method === "OPTIONS") {
+    return res.status(204).end();
+  }
+  // ----------------------------------------------------------------
+
   try {
     if (req.method !== "GET") {
       return res.status(405).json({ error: "Method not allowed" });
