@@ -27,32 +27,54 @@ export default async function handler(req, res) {
       "Be warm, encouraging, concise."
     ].join(" ");
 
-    const r = await fetch("https://api.openai.com/v1/realtime/sessions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+    const url = "https://api.openai.com/v1/realtime/sessions";
+    const commonHeaders = {
+      Authorization: `Bearer ${OPENAI_API_KEY}`,
+      "Content-Type": "application/json",
+      // TAHLE HLAVIČKA JE DŮLEŽITÁ PRO REALTIME
+      "OpenAI-Beta": "realtime=v1",
+    };
+
+    // 1) pokus s transkripcí zapnutou
+    const bodyWithTranscription = {
+      model,
+      voice,
+      instructions,
+      modalities: ["text", "audio"],
+      input_audio_format: "pcm16",
+      input_transcription: { enabled: true, language: "auto" },
+      turn_detection: { type: "server_vad" }
+    };
+
+    let r = await fetch(url, { method: "POST", headers: commonHeaders, body: JSON.stringify(bodyWithTranscription) });
+
+    // 2) fallback: když to OpenAI odmítne kvůli parametrům, zkusíme minimalistickou variantu
+    if (!r.ok) {
+      const err1 = await r.text();
+      const bodyMinimal = {
         model,
         voice,
         instructions,
         modalities: ["text", "audio"],
         input_audio_format: "pcm16",
-        // Vynutíme transkripce jako eventy:
-        input_transcription: { enabled: true, language: "auto" },
         turn_detection: { type: "server_vad" }
-      }),
-    });
-
-    if (!r.ok) {
-      const text = await r.text();
-      return res.status(r.status).json({ error: text });
+      };
+      const r2 = await fetch(url, { method: "POST", headers: commonHeaders, body: JSON.stringify(bodyMinimal) });
+      if (!r2.ok) {
+        const err2 = await r2.text();
+        return res.status(502).json({ error: "OpenAI session create failed", details: [err1, err2] });
+      }
+      r = r2;
     }
 
     const data = await r.json();
+    const token = data?.client_secret?.value;
+    if (!token) {
+      return res.status(502).json({ error: "No client_secret in OpenAI response", raw: data });
+    }
+
     return res.status(200).json({
-      token: data?.client_secret?.value,
+      token,
       expires_at: data?.expires_at,
       model,
       voice,
@@ -60,6 +82,6 @@ export default async function handler(req, res) {
     });
   } catch (e) {
     console.error(e);
-    return res.status(500).json({ error: "Token generation failed" });
+    return res.status(500).json({ error: "Token generation failed", detail: String(e?.message || e) });
   }
 }
