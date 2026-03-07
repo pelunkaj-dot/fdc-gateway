@@ -7,90 +7,183 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  const { level = "A1" } = req.query;
+  const { level = "A1", topic = "" } = req.query;
 
   const exercises = {
-    A1: [
-      {
-        id: "a1-001",
-        level: "A1",
-        topic: "daily routine",
-        grammar_focus: "present simple",
-        instruction_cs: "Poskládej správně anglickou větu.",
-        translation_cs: "Chodím do školy každý den.",
-        target_sentence: "I go to school every day",
-        correct_words: ["I", "go", "to", "school", "every", "day"],
-        extra_words: ["banana", "quickly"],
-        words: ["I", "go", "to", "school", "every", "day", "banana", "quickly"]
-      },
-      {
-        id: "a1-002",
-        level: "A1",
-        topic: "free time",
-        grammar_focus: "present simple",
-        instruction_cs: "Poskládej správně anglickou větu.",
-        translation_cs: "V neděli hrají fotbal.",
-        target_sentence: "They play football on Sunday",
-        correct_words: ["They", "play", "football", "on", "Sunday"],
-        extra_words: ["blue", "slowly"],
-        words: ["They", "play", "football", "on", "Sunday", "blue", "slowly"]
-      },
-      {
-        id: "a1-003",
-        level: "A1",
-        topic: "work",
-        grammar_focus: "present simple",
-        instruction_cs: "Poskládej správně anglickou větu.",
-        translation_cs: "Pracuje v kanceláři.",
-        target_sentence: "He works in an office",
-        correct_words: ["He", "works", "in", "an", "office"],
-        extra_words: ["yesterday", "green"],
-        words: ["He", "works", "in", "an", "office", "yesterday", "green"]
-      }
-    ],
-    A2: [
-      {
-        id: "a2-001",
-        level: "A2",
-        topic: "reading",
-        grammar_focus: "present continuous",
-        instruction_cs: "Poskládej správně anglickou větu.",
-        translation_cs: "Ona právě čte knihu.",
-        target_sentence: "She is reading a book",
-        correct_words: ["She", "is", "reading", "a", "book"],
-        extra_words: ["yesterday", "blue"],
-        words: ["She", "is", "reading", "a", "book", "yesterday", "blue"]
-      },
-      {
-        id: "a2-002",
-        level: "A2",
-        topic: "home",
-        grammar_focus: "present continuous",
-        instruction_cs: "Poskládej správně anglickou větu.",
-        translation_cs: "Dnes večer vaříme večeři.",
-        target_sentence: "We are cooking dinner tonight",
-        correct_words: ["We", "are", "cooking", "dinner", "tonight"],
-        extra_words: ["never", "small"],
-        words: ["We", "are", "cooking", "dinner", "tonight", "never", "small"]
-      },
-      {
-        id: "a2-003",
-        level: "A2",
-        topic: "media",
-        grammar_focus: "present continuous",
-        instruction_cs: "Poskládej správně anglickou větu.",
-        translation_cs: "Teď se dívám na televizi.",
-        target_sentence: "I am watching TV now",
-        correct_words: ["I", "am", "watching", "TV", "now"],
-        extra_words: ["tomorrow", "happy"],
-        words: ["I", "am", "watching", "TV", "now", "tomorrow", "happy"]
-      }
-    ]
+    A1: {
+      "present-simple": [
+        {
+          id: "a1-ps-001",
+          level: "A1",
+          topic: "present-simple",
+          grammar_focus: "present simple",
+          instruction_cs: "Poskládej správně anglickou větu.",
+          translation_cs: "Chodím do školy každý den.",
+          target_sentence: "I go to school every day",
+          correct_words: ["I", "go", "to", "school", "every", "day"],
+          extra_words: ["banana", "quickly"],
+          words: ["I", "go", "to", "school", "every", "day", "banana", "quickly"]
+        },
+        {
+          id: "a1-ps-002",
+          level: "A1",
+          topic: "present-simple",
+          grammar_focus: "present simple",
+          instruction_cs: "Poskládej správně anglickou větu.",
+          translation_cs: "V neděli hrají fotbal.",
+          target_sentence: "They play football on Sunday",
+          correct_words: ["They", "play", "football", "on", "Sunday"],
+          extra_words: ["blue", "slowly"],
+          words: ["They", "play", "football", "on", "Sunday", "blue", "slowly"]
+        },
+        {
+          id: "a1-ps-003",
+          level: "A1",
+          topic: "present-simple",
+          grammar_focus: "present simple",
+          instruction_cs: "Poskládej správně anglickou větu.",
+          translation_cs: "Pracuje v kanceláři.",
+          target_sentence: "He works in an office",
+          correct_words: ["He", "works", "in", "an", "office"],
+          extra_words: ["yesterday", "green"],
+          words: ["He", "works", "in", "an", "office", "yesterday", "green"]
+        }
+      ],
+      "present-continuous": [
+        {
+          id: "a1-pc-001",
+          level: "A1",
+          topic: "present-continuous",
+          grammar_focus: "present continuous",
+          instruction_cs: "Poskládej správně anglickou větu.",
+          translation_cs: "Ona právě čte knihu.",
+          target_sentence: "She is reading a book",
+          correct_words: ["She", "is", "reading", "a", "book"],
+          extra_words: ["yesterday", "blue"],
+          words: ["She", "is", "reading", "a", "book", "yesterday", "blue"]
+        },
+        {
+          id: "a1-pc-002",
+          level: "A1",
+          topic: "present-continuous",
+          grammar_focus: "present continuous",
+          instruction_cs: "Poskládej správně anglickou větu.",
+          translation_cs: "Dnes večer vaříme večeři.",
+          target_sentence: "We are cooking dinner tonight",
+          correct_words: ["We", "are", "cooking", "dinner", "tonight"],
+          extra_words: ["never", "small"],
+          words: ["We", "are", "cooking", "dinner", "tonight", "never", "small"]
+        },
+        {
+          id: "a1-pc-003",
+          level: "A1",
+          topic: "present-continuous",
+          grammar_focus: "present continuous",
+          instruction_cs: "Poskládej správně anglickou větu.",
+          translation_cs: "Teď se dívám na televizi.",
+          target_sentence: "I am watching TV now",
+          correct_words: ["I", "am", "watching", "TV", "now"],
+          extra_words: ["tomorrow", "happy"],
+          words: ["I", "am", "watching", "TV", "now", "tomorrow", "happy"]
+        }
+      ]
+    },
+    A2: {
+      "present-continuous": [
+        {
+          id: "a2-pc-001",
+          level: "A2",
+          topic: "present-continuous",
+          grammar_focus: "present continuous",
+          instruction_cs: "Poskládej správně anglickou větu.",
+          translation_cs: "Ona právě čte knihu.",
+          target_sentence: "She is reading a book",
+          correct_words: ["She", "is", "reading", "a", "book"],
+          extra_words: ["yesterday", "blue"],
+          words: ["She", "is", "reading", "a", "book", "yesterday", "blue"]
+        },
+        {
+          id: "a2-pc-002",
+          level: "A2",
+          topic: "present-continuous",
+          grammar_focus: "present continuous",
+          instruction_cs: "Poskládej správně anglickou větu.",
+          translation_cs: "Dnes večer vaříme večeři.",
+          target_sentence: "We are cooking dinner tonight",
+          correct_words: ["We", "are", "cooking", "dinner", "tonight"],
+          extra_words: ["never", "small"],
+          words: ["We", "are", "cooking", "dinner", "tonight", "never", "small"]
+        },
+        {
+          id: "a2-pc-003",
+          level: "A2",
+          topic: "present-continuous",
+          grammar_focus: "present continuous",
+          instruction_cs: "Poskládej správně anglickou větu.",
+          translation_cs: "Teď se dívám na televizi.",
+          target_sentence: "I am watching TV now",
+          correct_words: ["I", "am", "watching", "TV", "now"],
+          extra_words: ["tomorrow", "happy"],
+          words: ["I", "am", "watching", "TV", "now", "tomorrow", "happy"]
+        }
+      ],
+      "present-perfect": [
+        {
+          id: "a2-pp-001",
+          level: "A2",
+          topic: "present-perfect",
+          grammar_focus: "present perfect",
+          instruction_cs: "Poskládej správně anglickou větu.",
+          translation_cs: "Nikdy jsem nebyl v Londýně.",
+          target_sentence: "I have never been to London",
+          correct_words: ["I", "have", "never", "been", "to", "London"],
+          extra_words: ["yesterday", "green"],
+          words: ["I", "have", "never", "been", "to", "London", "yesterday", "green"]
+        },
+        {
+          id: "a2-pp-002",
+          level: "A2",
+          topic: "present-perfect",
+          grammar_focus: "present perfect",
+          instruction_cs: "Poskládej správně anglickou větu.",
+          translation_cs: "Už dokončila domácí úkol.",
+          target_sentence: "She has already finished her homework",
+          correct_words: ["She", "has", "already", "finished", "her", "homework"],
+          extra_words: ["tomorrow", "blue"],
+          words: ["She", "has", "already", "finished", "her", "homework", "tomorrow", "blue"]
+        },
+        {
+          id: "a2-pp-003",
+          level: "A2",
+          topic: "present-perfect",
+          grammar_focus: "present perfect",
+          instruction_cs: "Poskládej správně anglickou větu.",
+          translation_cs: "Žijeme tady už dva roky.",
+          target_sentence: "We have lived here for two years",
+          correct_words: ["We", "have", "lived", "here", "for", "two", "years"],
+          extra_words: ["last", "small"],
+          words: ["We", "have", "lived", "here", "for", "two", "years", "last", "small"]
+        }
+      ]
+    }
   };
 
-  const pool = exercises[level] || exercises.A1;
-  const randomIndex = Math.floor(Math.random() * pool.length);
-  const exercise = pool[randomIndex];
+  const levelBucket = exercises[level] || exercises.A1;
+  const topicBucket = levelBucket[topic];
 
-  res.status(200).json(exercise);
+  if (topicBucket && topicBucket.length > 0) {
+    const randomIndex = Math.floor(Math.random() * topicBucket.length);
+    return res.status(200).json(topicBucket[randomIndex]);
+  }
+
+  const fallbackTopics = Object.keys(levelBucket);
+  const firstTopic = fallbackTopics[0];
+  const fallbackPool = levelBucket[firstTopic];
+
+  if (fallbackPool && fallbackPool.length > 0) {
+    const randomIndex = Math.floor(Math.random() * fallbackPool.length);
+    return res.status(200).json(fallbackPool[randomIndex]);
+  }
+
+  return res.status(404).json({ error: "No exercise found" });
 }
