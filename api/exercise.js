@@ -10,10 +10,12 @@ module.exports = async function handler(req, res) {
     const sentenceCs = (req.query.sentenceCs || "").trim();
 
     if (!level || !topic) {
-      return res.status(400).json({
-        error: "Missing level or topic",
-      });
-    }
+  if (!sentenceCs) {
+    return res.status(400).json({
+      error: "Missing level or topic",
+    });
+  }
+}
     
     if (sentenceCs) {
   const customExercise = await buildExerciseFromSentence(sentenceCs);
