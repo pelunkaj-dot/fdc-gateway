@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "level": "A1",
+  "topic": "present-simple",
+  "instructionCs": "Poskládej správně anglickou větu.",
+  "items": [
+    {
+      "id": "a1-ps-001",
+      "translationCs": "Každý den chodím do školy.",
+      "targetSentence": "I go to school every day",
+      "correctWords": ["I","go","to","school","every","day"],
+      "extraWords": ["banana","slowly"]
+    },
+    {
+      "id": "a1-ps-002",
+      "translationCs": "Každé ráno piju kávu.",
+      "targetSentence": "I drink coffee every morning",
+      "correctWords": ["I","drink","coffee","every","morning"],
+      "extraWords": ["green","under"]
+    },
+    {
+      "id": "a1-ps-003",
+      "translationCs": "Bydlíme v Opavě.",
+      "targetSentence": "We live in Opava",
+      "correctWords": ["We","live","in","Opava"],
+      "extraWords": ["yellow","behind"]
+    },
+    {
+      "id": "a1-ps-004",
+      "translationCs": "Večer se dívají na televizi.",
+      "targetSentence": "They watch TV in the evening",
+      "correctWords": ["They","watch","TV","in","the","evening"],
+      "extraWords": ["banana","between"]
+    }
+  ]
+}
