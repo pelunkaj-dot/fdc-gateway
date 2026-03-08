@@ -1,0 +1,23 @@
+[
+  {
+    "id": "a1_ps_001",
+    "translation_cs": "Každý den chodím do práce autobusem.",
+    "target_sentence": "I go to work by bus every day",
+    "words": ["I","go","to","work","by","bus","every","day"],
+    "extra_words": ["banana","quickly"]
+  },
+  {
+    "id": "a1_ps_002",
+    "translation_cs": "On pije kávu každé ráno.",
+    "target_sentence": "He drinks coffee every morning",
+    "words": ["He","drinks","coffee","every","morning"],
+    "extra_words": ["banana","quickly"]
+  },
+  {
+    "id": "a1_ps_003",
+    "translation_cs": "Bydlíme v malém domě.",
+    "target_sentence": "We live in a small house",
+    "words": ["We","live","in","a","small","house"],
+    "extra_words": ["banana","quickly"]
+  }
+]
