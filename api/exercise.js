@@ -18,7 +18,7 @@ module.exports = async function handler(req, res) {
 }
     
     if (sentenceCs) {
-  const customExercise = await buildExerciseFromSentence(sentenceCs);
+ const customExercise = await buildExerciseFromSentence(sentenceCs, level, topic);
 
   return res.status(200).json({
     exercise: customExercise,
