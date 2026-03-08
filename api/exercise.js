@@ -1,6 +1,7 @@
 const { getTopicData } = require("../lib/exercises/repository");
 const { pickRandom } = require("../lib/exercises/picker");
 const { normalizeUsedIds, appendUsedId } = require("../lib/exercises/memory");
+const { buildExerciseFromSentence } = require("../lib/exercises/custom");
 
 module.exports = async function handler(req, res) {
   try {
