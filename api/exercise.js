@@ -14,6 +14,22 @@ function shuffleArray(array) {
   return result;
 }
 
+async function buildAiTopicExercise(level, topic) {
+  const customExercise = await buildExerciseFromSentence(
+    `Vytvoř vhodnou českou větu pro gramatiku ${topic} na úrovni ${level}.`,
+    level,
+    topic
+  );
+
+  return {
+    ...customExercise,
+    words: shuffleArray([
+      ...customExercise.correctWords,
+      ...customExercise.extraWords
+    ])
+  };
+}
+
 module.exports = async function handler(req, res) {
   try {
     const level = (req.query.level || "").trim().toUpperCase();
@@ -48,11 +64,24 @@ module.exports = async function handler(req, res) {
       });
     }
 
+    const items = getTopicData(level, topic);
+
+    if (!items || items.length === 0) {
+      const fallbackExercise = await buildAiTopicExercise(level, topic);
+
+      return res.status(200).json({
+        exercise: fallbackExercise,
+        usedIds: [],
+        recycled: false,
+        sourceType: "ai-fallback",
+        requestedTopic: topic,
+        resolvedTopic: topic
+      });
+    }
+
     const usedIds = normalizeUsedIds(
       req.query.usedIds ? req.query.usedIds.split(",") : []
     );
-
-    const items = getTopicData(level, topic);
 
     const available = items.filter((item) => !usedIds.includes(item.id));
     const pool = available.length > 0 ? available : items;
