@@ -1,6 +1,9 @@
 {
   "name": "fdc-gateway",
   "version": "1.0.0",
+  "scripts": {
+    "generate": "node scripts/generate-exercises.js"
+  },
   "dependencies": {
     "openai": "^4.0.0"
   }
