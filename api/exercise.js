@@ -42,7 +42,9 @@ module.exports = async function handler(req, res) {
         },
         usedIds: [],
         recycled: false,
-        sourceType: "custom"
+        sourceType: "custom",
+        requestedTopic: topic,
+        resolvedTopic: topic
       });
     }
 
@@ -58,13 +60,14 @@ module.exports = async function handler(req, res) {
     const picked = pickRandom(pool);
     const nextUsedIds = appendUsedId(usedIds, picked.id);
 
-return res.status(200).json({
-  exercise: picked,
-  usedIds: nextUsedIds,
-  recycled: available.length === 0,
-  sourceType: "preset"
-});
-    
+    return res.status(200).json({
+      exercise: picked,
+      usedIds: nextUsedIds,
+      recycled: available.length === 0,
+      sourceType: "preset",
+      requestedTopic: topic,
+      resolvedTopic: topic
+    });
   } catch (error) {
     return res.status(500).json({
       error: error.message || "Internal server error",
