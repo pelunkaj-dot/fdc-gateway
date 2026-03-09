@@ -1,3 +1,5 @@
+const fs = require("fs");
+const path = require("path");
 const OpenAI = require("openai");
 
 const openai = new OpenAI({
@@ -70,14 +72,24 @@ async function main() {
   const level = process.argv[2];
   const topic = process.argv[3];
   const count = Number(process.argv[4] || 20);
+  const outputFile = process.argv[5];
 
   if (!level || !topic) {
-    console.error("Usage: node scripts/generate-exercises.js A1 present-simple 20");
+    console.error("Usage: node scripts/generate-exercises.js A1 present-simple 20 [output-file]");
     process.exit(1);
   }
 
   const items = await generateExercises(level, topic, count);
-  console.log(JSON.stringify(items, null, 2));
+  const json = JSON.stringify(items, null, 2);
+
+  if (outputFile) {
+    const outputPath = path.resolve(process.cwd(), outputFile);
+    fs.writeFileSync(outputPath, json, "utf8");
+    console.log(`Saved ${items.length} items to ${outputPath}`);
+    return;
+  }
+
+  console.log(json);
 }
 
 main().catch((error) => {
