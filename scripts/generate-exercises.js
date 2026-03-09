@@ -33,11 +33,19 @@ Pravidla:
 - translation_cs musí být přirozená spisovná čeština
 - target_sentence musí odpovídat úrovni ${level}
 - target_sentence musí odpovídat gramatice ${topic}
-- correct_words obsahuje správná slova ve správném pořadí
+- oznamovací věta má končit tečkou
+- tázací věta má končit otazníkem
+- correct_words obsahuje správná slova ve správném pořadí, bez koncové interpunkce
 - extra_words obsahuje přesně 2 rušivá slova
-- words musí obsahovat všechna correct_words a extra_words promíchaně
-- každá věta musí být jiná a užitečná pro procvičování
-- nepoužívej zbytečně exotická nebo knižní slovíčka
+- words musí obsahovat všechna correct_words a extra_words promíchaně, bez koncové interpunkce
+- věty musí být krátké, přirozené a vhodné pro školní procvičování
+- používej běžnou slovní zásobu odpovídající úrovni ${level}
+- v rámci dávky střídej osoby, podměty, slovesa, předměty, místa, časová určení a slovní zásobu
+- nezačínej stále stejnými podměty typu I, he, she
+- pokud to gramatika dovoluje, střídej oznamovací a tázací věty
+- neopakuj téměř stejné věty jen s jiným jménem nebo jedním slovem
+- každá věta musí být didakticky užitečná pro procvičování
+- nepoužívej zbytečně exotická, knižní nebo divná slova
 - výstup musí být validní JSON
 - nepiš žádné vysvětlení, jen JSON pole
 `;
