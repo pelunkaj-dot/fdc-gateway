@@ -1528,6 +1528,41 @@ const apiState = {
     updateBuiltSentence();
   };
 
+  async function fetchExerciseFromApi() {
+
+  const payload = {
+    level: apiState.level,
+    topic: apiState.topic,
+    usedIds: apiState.usedIds
+  };
+
+  if (apiState.sentenceCs) {
+    payload.sentenceCs = apiState.sentenceCs;
+  }
+
+  const res = await fetch("/api/exercise", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  });
+
+  if (!res.ok) {
+    console.error("API error");
+    return null;
+  }
+
+  const data = await res.json();
+
+  apiState.currentExercise = data;
+
+  if (data.id && !apiState.usedIds.includes(data.id)) {
+    apiState.usedIds.push(data.id);
+  }
+
+  return data;
+}
   init();
 })();
 </script>
