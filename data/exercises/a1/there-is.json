@@ -1,0 +1,664 @@
+[
+  {
+    "id": "a1-there-is-001",
+    "level": "A1",
+    "topic": "there-is",
+    "grammar_focus": "there-is",
+    "instruction_cs": "Poskládej správně anglickou větu.",
+    "translation_cs": "Na stole je kniha.",
+    "target_sentence": "There is a book on the table.",
+    "correct_words": [
+      "There",
+      "is",
+      "a",
+      "book",
+      "on",
+      "the",
+      "table"
+    ],
+    "extra_words": [
+      "cat",
+      "under"
+    ],
+    "words": [
+      "There",
+      "cat",
+      "is",
+      "a",
+      "book",
+      "under",
+      "on",
+      "the",
+      "table"
+    ]
+  },
+  {
+    "id": "a1-there-is-002",
+    "level": "A1",
+    "topic": "there-is",
+    "grammar_focus": "there-is",
+    "instruction_cs": "Poskládej správně anglickou větu.",
+    "translation_cs": "V místnosti je židle.",
+    "target_sentence": "There is a chair in the room.",
+    "correct_words": [
+      "There",
+      "is",
+      "a",
+      "chair",
+      "in",
+      "the",
+      "room"
+    ],
+    "extra_words": [
+      "dog",
+      "under"
+    ],
+    "words": [
+      "There",
+      "dog",
+      "is",
+      "a",
+      "chair",
+      "under",
+      "in",
+      "the",
+      "room"
+    ]
+  },
+  {
+    "id": "a1-there-is-003",
+    "level": "A1",
+    "topic": "there-is",
+    "grammar_focus": "there-is",
+    "instruction_cs": "Poskládej správně anglickou větu.",
+    "translation_cs": "Na stole je jablko.",
+    "target_sentence": "There is an apple on the table.",
+    "correct_words": [
+      "There",
+      "is",
+      "an",
+      "apple",
+      "on",
+      "the",
+      "table"
+    ],
+    "extra_words": [
+      "cat",
+      "under"
+    ],
+    "words": [
+      "There",
+      "cat",
+      "is",
+      "an",
+      "apple",
+      "under",
+      "on",
+      "the",
+      "table"
+    ]
+  },
+  {
+    "id": "a1-there-is-004",
+    "level": "A1",
+    "topic": "there-is",
+    "grammar_focus": "there-is",
+    "instruction_cs": "Poskládej správně anglickou větu.",
+    "translation_cs": "V parku je strom.",
+    "target_sentence": "There is a tree in the park.",
+    "correct_words": [
+      "There",
+      "is",
+      "a",
+      "tree",
+      "in",
+      "the",
+      "park"
+    ],
+    "extra_words": [
+      "dog",
+      "under"
+    ],
+    "words": [
+      "There",
+      "dog",
+      "is",
+      "a",
+      "tree",
+      "under",
+      "in",
+      "the",
+      "park"
+    ]
+  },
+  {
+    "id": "a1-there-is-005",
+    "level": "A1",
+    "topic": "there-is",
+    "grammar_focus": "there-is",
+    "instruction_cs": "Poskládej správně anglickou větu.",
+    "translation_cs": "Na stole je pero.",
+    "target_sentence": "There is a pen on the table.",
+    "correct_words": [
+      "There",
+      "is",
+      "a",
+      "pen",
+      "on",
+      "the",
+      "table"
+    ],
+    "extra_words": [
+      "cat",
+      "under"
+    ],
+    "words": [
+      "There",
+      "cat",
+      "is",
+      "a",
+      "pen",
+      "under",
+      "on",
+      "the",
+      "table"
+    ]
+  },
+  {
+    "id": "a1-there-is-006",
+    "level": "A1",
+    "topic": "there-is",
+    "grammar_focus": "there-is",
+    "instruction_cs": "Poskládej správně anglickou větu.",
+    "translation_cs": "V kuchyni je lednička.",
+    "target_sentence": "There is a fridge in the kitchen.",
+    "correct_words": [
+      "There",
+      "is",
+      "a",
+      "fridge",
+      "in",
+      "the",
+      "kitchen"
+    ],
+    "extra_words": [
+      "dog",
+      "under"
+    ],
+    "words": [
+      "There",
+      "dog",
+      "is",
+      "a",
+      "fridge",
+      "under",
+      "in",
+      "the",
+      "kitchen"
+    ]
+  },
+  {
+    "id": "a1-there-is-007",
+    "level": "A1",
+    "topic": "there-is",
+    "grammar_focus": "there-is",
+    "instruction_cs": "Poskládej správně anglickou větu.",
+    "translation_cs": "Na stole je telefon.",
+    "target_sentence": "There is a phone on the table.",
+    "correct_words": [
+      "There",
+      "is",
+      "a",
+      "phone",
+      "on",
+      "the",
+      "table"
+    ],
+    "extra_words": [
+      "cat",
+      "under"
+    ],
+    "words": [
+      "There",
+      "cat",
+      "is",
+      "a",
+      "phone",
+      "under",
+      "on",
+      "the",
+      "table"
+    ]
+  },
+  {
+    "id": "a1-there-is-008",
+    "level": "A1",
+    "topic": "there-is",
+    "grammar_focus": "there-is",
+    "instruction_cs": "Poskládej správně anglickou větu.",
+    "translation_cs": "V autě je rádio.",
+    "target_sentence": "There is a radio in the car.",
+    "correct_words": [
+      "There",
+      "is",
+      "a",
+      "radio",
+      "in",
+      "the",
+      "car"
+    ],
+    "extra_words": [
+      "dog",
+      "under"
+    ],
+    "words": [
+      "There",
+      "dog",
+      "is",
+      "a",
+      "radio",
+      "under",
+      "in",
+      "the",
+      "car"
+    ]
+  },
+  {
+    "id": "a1-there-is-009",
+    "level": "A1",
+    "topic": "there-is",
+    "grammar_focus": "there-is",
+    "instruction_cs": "Poskládej správně anglickou větu.",
+    "translation_cs": "Na stole je hodiny.",
+    "target_sentence": "There is a clock on the table.",
+    "correct_words": [
+      "There",
+      "is",
+      "a",
+      "clock",
+      "on",
+      "the",
+      "table"
+    ],
+    "extra_words": [
+      "cat",
+      "under"
+    ],
+    "words": [
+      "There",
+      "cat",
+      "is",
+      "a",
+      "clock",
+      "under",
+      "on",
+      "the",
+      "table"
+    ]
+  },
+  {
+    "id": "a1-there-is-010",
+    "level": "A1",
+    "topic": "there-is",
+    "grammar_focus": "there-is",
+    "instruction_cs": "Poskládej správně anglickou větu.",
+    "translation_cs": "V místnosti je lampa.",
+    "target_sentence": "There is a lamp in the room.",
+    "correct_words": [
+      "There",
+      "is",
+      "a",
+      "lamp",
+      "in",
+      "the",
+      "room"
+    ],
+    "extra_words": [
+      "dog",
+      "under"
+    ],
+    "words": [
+      "There",
+      "dog",
+      "is",
+      "a",
+      "lamp",
+      "under",
+      "in",
+      "the",
+      "room"
+    ]
+  },
+  {
+    "id": "a1-there-is-011",
+    "level": "A1",
+    "topic": "there-is",
+    "grammar_focus": "there-is",
+    "instruction_cs": "Poskládej správně anglickou větu.",
+    "translation_cs": "Na stole je hrnek.",
+    "target_sentence": "There is a cup on the table.",
+    "correct_words": [
+      "There",
+      "is",
+      "a",
+      "cup",
+      "on",
+      "the",
+      "table"
+    ],
+    "extra_words": [
+      "cat",
+      "under"
+    ],
+    "words": [
+      "There",
+      "cat",
+      "is",
+      "a",
+      "cup",
+      "under",
+      "on",
+      "the",
+      "table"
+    ]
+  },
+  {
+    "id": "a1-there-is-012",
+    "level": "A1",
+    "topic": "there-is",
+    "grammar_focus": "there-is",
+    "instruction_cs": "Poskládej správně anglickou větu.",
+    "translation_cs": "V zahradě je květina.",
+    "target_sentence": "There is a flower in the garden.",
+    "correct_words": [
+      "There",
+      "is",
+      "a",
+      "flower",
+      "in",
+      "the",
+      "garden"
+    ],
+    "extra_words": [
+      "dog",
+      "under"
+    ],
+    "words": [
+      "There",
+      "dog",
+      "is",
+      "a",
+      "flower",
+      "under",
+      "in",
+      "the",
+      "garden"
+    ]
+  },
+  {
+    "id": "a1-there-is-013",
+    "level": "A1",
+    "topic": "there-is",
+    "grammar_focus": "there-is",
+    "instruction_cs": "Poskládej správně anglickou větu.",
+    "translation_cs": "Na stole je klíč.",
+    "target_sentence": "There is a key on the table.",
+    "correct_words": [
+      "There",
+      "is",
+      "a",
+      "key",
+      "on",
+      "the",
+      "table"
+    ],
+    "extra_words": [
+      "cat",
+      "under"
+    ],
+    "words": [
+      "There",
+      "cat",
+      "is",
+      "a",
+      "key",
+      "under",
+      "on",
+      "the",
+      "table"
+    ]
+  },
+  {
+    "id": "a1-there-is-014",
+    "level": "A1",
+    "topic": "there-is",
+    "grammar_focus": "there-is",
+    "instruction_cs": "Poskládej správně anglickou větu.",
+    "translation_cs": "V pokoji je okno.",
+    "target_sentence": "There is a window in the room.",
+    "correct_words": [
+      "There",
+      "is",
+      "a",
+      "window",
+      "in",
+      "the",
+      "room"
+    ],
+    "extra_words": [
+      "dog",
+      "under"
+    ],
+    "words": [
+      "There",
+      "dog",
+      "is",
+      "a",
+      "window",
+      "under",
+      "in",
+      "the",
+      "room"
+    ]
+  },
+  {
+    "id": "a1-there-is-015",
+    "level": "A1",
+    "topic": "there-is",
+    "grammar_focus": "there-is",
+    "instruction_cs": "Poskládej správně anglickou větu.",
+    "translation_cs": "Na stole je notebook.",
+    "target_sentence": "There is a laptop on the table.",
+    "correct_words": [
+      "There",
+      "is",
+      "a",
+      "laptop",
+      "on",
+      "the",
+      "table"
+    ],
+    "extra_words": [
+      "cat",
+      "under"
+    ],
+    "words": [
+      "There",
+      "cat",
+      "is",
+      "a",
+      "laptop",
+      "under",
+      "on",
+      "the",
+      "table"
+    ]
+  },
+  {
+    "id": "a1-there-is-016",
+    "level": "A1",
+    "topic": "there-is",
+    "grammar_focus": "there-is",
+    "instruction_cs": "Poskládej správně anglickou větu.",
+    "translation_cs": "V garáži je auto.",
+    "target_sentence": "There is a car in the garage.",
+    "correct_words": [
+      "There",
+      "is",
+      "a",
+      "car",
+      "in",
+      "the",
+      "garage"
+    ],
+    "extra_words": [
+      "dog",
+      "under"
+    ],
+    "words": [
+      "There",
+      "dog",
+      "is",
+      "a",
+      "car",
+      "under",
+      "in",
+      "the",
+      "garage"
+    ]
+  },
+  {
+    "id": "a1-there-is-017",
+    "level": "A1",
+    "topic": "there-is",
+    "grammar_focus": "there-is",
+    "instruction_cs": "Poskládej správně anglickou větu.",
+    "translation_cs": "Na stole je láhev.",
+    "target_sentence": "There is a bottle on the table.",
+    "correct_words": [
+      "There",
+      "is",
+      "a",
+      "bottle",
+      "on",
+      "the",
+      "table"
+    ],
+    "extra_words": [
+      "cat",
+      "under"
+    ],
+    "words": [
+      "There",
+      "cat",
+      "is",
+      "a",
+      "bottle",
+      "under",
+      "on",
+      "the",
+      "table"
+    ]
+  },
+  {
+    "id": "a1-there-is-018",
+    "level": "A1",
+    "topic": "there-is",
+    "grammar_focus": "there-is",
+    "instruction_cs": "Poskládej správně anglickou větu.",
+    "translation_cs": "V koupelně je zrcadlo.",
+    "target_sentence": "There is a mirror in the bathroom.",
+    "correct_words": [
+      "There",
+      "is",
+      "a",
+      "mirror",
+      "in",
+      "the",
+      "bathroom"
+    ],
+    "extra_words": [
+      "dog",
+      "under"
+    ],
+    "words": [
+      "There",
+      "dog",
+      "is",
+      "a",
+      "mirror",
+      "under",
+      "in",
+      "the",
+      "bathroom"
+    ]
+  },
+  {
+    "id": "a1-there-is-019",
+    "level": "A1",
+    "topic": "there-is",
+    "grammar_focus": "there-is",
+    "instruction_cs": "Poskládej správně anglickou větu.",
+    "translation_cs": "Na stole je mapa.",
+    "target_sentence": "There is a map on the table.",
+    "correct_words": [
+      "There",
+      "is",
+      "a",
+      "map",
+      "on",
+      "the",
+      "table"
+    ],
+    "extra_words": [
+      "cat",
+      "under"
+    ],
+    "words": [
+      "There",
+      "cat",
+      "is",
+      "a",
+      "map",
+      "under",
+      "on",
+      "the",
+      "table"
+    ]
+  },
+  {
+    "id": "a1-there-is-020",
+    "level": "A1",
+    "topic": "there-is",
+    "grammar_focus": "there-is",
+    "instruction_cs": "Poskládej správně anglickou větu.",
+    "translation_cs": "V obývacím pokoji je televize.",
+    "target_sentence": "There is a TV in the living room.",
+    "correct_words": [
+      "There",
+      "is",
+      "a",
+      "TV",
+      "in",
+      "the",
+      "living",
+      "room"
+    ],
+    "extra_words": [
+      "dog",
+      "under"
+    ],
+    "words": [
+      "There",
+      "dog",
+      "is",
+      "a",
+      "TV",
+      "under",
+      "in",
+      "the",
+      "living",
+      "room"
+    ]
+  }
+]
