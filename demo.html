@@ -1575,6 +1575,8 @@ createBtn.addEventListener("click", async () => {
 }
   async function fetchExerciseFromApi() {
 
+  console.log("DEBUG level/topic:", levelSel.value, topicSel.value);
+    
   const payload = {
     level: levelSel.value,
     topic: topicSel.value,
