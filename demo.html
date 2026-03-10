@@ -1,0 +1,1529 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Demo zdarma (offline) – Skládání anglických vět</title>
+  <style>
+    :root{
+      --bg:#f6f7fb; --card:#ffffff; --text:#111827; --muted:#6b7280;
+      --border:#e6e8f0; --dash:#cfd6f3;
+      --primary:#2563eb; --primary2:#1d4ed8;
+      --good:#1a7f37; --warn:#b26a00; --bad:#c21c1c;
+      --shadow: 0 10px 24px rgba(0,0,0,.08);
+      --shadow2: 0 4px 14px rgba(0,0,0,.07);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0; color:var(--text);
+      background: var(--bg);
+      position:relative;
+      overflow-x:hidden;
+    }
+
+    /* Zvýrazněná, ale pořád jemná britská vlajka */
+    .bg-flag{
+      position:fixed; inset:0;
+      pointer-events:none;
+      z-index:0;
+      opacity:.095;
+      background-size: 900px 520px;
+      background-repeat: repeat;
+      background-position: center;
+      filter: saturate(1.2) contrast(1.15) blur(0.5px);
+      transform: scale(1.02);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='520' viewBox='0 0 900 520'%3E%3Crect width='900' height='520' fill='%23001247'/%3E%3Cpath d='M0 0 L900 520 M900 0 L0 520' stroke='%23ffffff' stroke-width='120'/%3E%3Cpath d='M0 0 L900 520 M900 0 L0 520' stroke='%23cf142b' stroke-width='60'/%3E%3Crect x='0' y='200' width='900' height='120' fill='%23ffffff'/%3E%3Crect x='0' y='230' width='900' height='60' fill='%23cf142b'/%3E%3Crect x='390' y='0' width='120' height='520' fill='%23ffffff'/%3E%3Crect x='420' y='0' width='60' height='520' fill='%23cf142b'/%3E%3C/svg%3E");
+    }
+
+    .wrap{ max-width:1200px; margin:0 auto; padding:18px; position:relative; z-index:1; }
+    h1{ margin:0 0 8px; font-size:20px; }
+    .topHint{
+      margin:0 0 14px; color:var(--muted);
+      background:rgba(255,255,255,.82);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:12px 14px;
+      box-shadow: 0 6px 18px rgba(0,0,0,.05);
+      backdrop-filter: blur(5px);
+      line-height:1.35;
+      font-weight:800;
+    }
+
+    .panelGrid{ display:grid; grid-template-columns:1fr; gap:14px; }
+    @media (min-width: 980px){
+      .panelGrid{ grid-template-columns: 460px 1fr; align-items:start; }
+    }
+    .card{
+      background:rgba(255,255,255,.93);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:14px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(7px);
+    }
+    .sectionTitle{ font-weight:900; margin:0 0 10px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .pill{ font-size:12px; font-weight:900; border:1px solid var(--border); background:#f3f4f8; border-radius:999px; padding:4px 10px; color:#111827; }
+
+    label{ font-weight:900; font-size:13px; display:block; margin:0 0 6px; }
+    textarea, input[type="text"]{
+      width:100%;
+      border:1px solid #d7daea; border-radius:14px; padding:10px 12px;
+      font-weight:800; outline:none;
+      box-shadow: 0 3px 10px rgba(0,0,0,.05);
+      background:white;
+    }
+    textarea{ min-height:84px; resize:vertical; font-weight:750; }
+    textarea[readonly]{
+      background:#f8fafc;
+      color:#0f172a;
+      cursor:not-allowed;
+    }
+    select{
+      width:100%;
+      border:1px solid #d7daea; border-radius:14px; padding:10px 12px;
+      font-weight:900; background:white;
+      box-shadow: 0 3px 10px rgba(0,0,0,.05);
+    }
+    .row2{ display:grid; grid-template-columns:1fr; gap:10px; }
+    @media (min-width: 520px){
+      .row2{ grid-template-columns: 1fr 1fr; }
+    }
+
+    button{
+      border:1px solid #d7daea;
+      background:white;
+      padding:10px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:900;
+      color:#0f172a;
+      box-shadow: 0 3px 10px rgba(0,0,0,.06);
+      transition: transform .06s ease, background .12s ease, box-shadow .12s ease;
+    }
+    button:hover{ background:#f1f3fb; }
+    button:active{ transform: scale(.99); }
+    button.primary{ background:var(--primary); color:white; border-color:var(--primary); }
+    button.primary:hover{ background:var(--primary2); }
+    button.warn{ background:#fff7ed; border-color:#fed7aa; }
+    button.danger{ background:#fff1f2; border-color:#fecdd3; }
+    button.ghost{ background:#f3f4ff; border-color:#dbe1ff; }
+    .btnRow{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .tiny{ font-size:12px; color:var(--muted); font-weight:800; }
+
+    .hr{ height:1px; background:var(--border); margin:12px 0; }
+
+    .note{
+      margin-top:10px;
+      padding:10px 12px;
+      border:1px solid var(--border);
+      background:rgba(251,252,255,.86);
+      border-radius:14px;
+      color:var(--muted);
+      box-shadow: var(--shadow2);
+      font-size:13px;
+      font-weight:850;
+      line-height:1.35;
+    }
+
+    .seg{
+      display:flex; gap:6px;
+      background:#f3f4f8;
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:6px;
+      box-shadow: 0 3px 10px rgba(0,0,0,.05);
+      user-select:none;
+    }
+    .seg button{
+      box-shadow:none;
+      border:1px solid transparent;
+      border-radius:12px;
+      padding:9px 10px;
+      background:transparent;
+      font-weight:950;
+    }
+    .seg button.active{
+      background:white;
+      border-color:#d7daea;
+      box-shadow: 0 4px 12px rgba(0,0,0,.06);
+    }
+
+    .targetBox{
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:12px;
+      background:rgba(251,252,255,.90);
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(6px);
+    }
+    .targetTopRow{ display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:flex-start; }
+    .targetHint{ font-size:14px; font-weight:950; color:var(--muted); padding:6px 0; }
+
+    .builtRow{ margin-top:8px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+    .builtSentence{
+      font-size:18px; font-weight:950; line-height:1.35;
+      display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+      min-height:34px;
+    }
+    .builtSentence .placeholder{ color:var(--muted); font-weight:850; }
+    .speaker{
+      border:1px solid var(--border);
+      background:white;
+      border-radius:999px;
+      padding:8px 12px;
+      cursor:pointer;
+      user-select:none;
+      box-shadow: 0 4px 12px rgba(0,0,0,.07);
+      display:inline-flex; align-items:center; gap:6px;
+    }
+    .speaker:hover{ background:#f1f5ff; border-color:#c7d2fe; }
+    .hintLine{ margin:8px 0 0; font-size:13px; color:var(--muted); font-weight:850; }
+
+    .translation{
+      margin-top:10px;
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:10px 12px;
+      background:rgba(248,250,252,.94);
+      color:#0f172a;
+      box-shadow: var(--shadow2);
+      display:none;
+      font-weight:900;
+    }
+    .translation.show{ display:block; }
+
+    .grid{
+      display:grid; grid-template-columns:1fr; gap:14px; margin-top:14px;
+    }
+    @media (min-width: 920px){
+      .grid{ grid-template-columns: 360px 1fr; align-items:start; }
+    }
+    .zoneTitleRow{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+    .zone{
+      min-height: 140px;
+      border: 2px dashed var(--dash);
+      border-radius: 16px;
+      padding: 12px;
+      background: rgba(251,252,255,.94);
+      display:flex; gap:10px; flex-wrap:wrap;
+      align-items:flex-start; align-content:flex-start;
+      transition: .12s ease;
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(6px);
+    }
+    .zone.isOver{
+      border-color: var(--primary);
+      background:#f2f7ff;
+      box-shadow: 0 0 0 4px rgba(37,99,235,.10), var(--shadow2);
+    }
+    .token{
+      user-select:none;
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid #d7daea;
+      background:white;
+      cursor:grab;
+      font-weight:950;
+      box-shadow: 0 4px 14px rgba(0,0,0,.08);
+      white-space:nowrap;
+      transition: transform .12s ease, opacity .08s ease, border-color .12s ease, background .12s ease, box-shadow .12s ease;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+    .token:hover{
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(0,0,0,.11);
+    }
+    .token:active{ cursor:grabbing; transform: scale(.98); }
+    .token.dragging{ opacity:.55; }
+    .token.correct{ border-color:#7dd38c; background:#f1fff4; }
+    .token.wrong{ border-color:#ffb4a6; background:#fff7ed; }
+
+    .zone.correctFlash{
+      animation: correctFlash 0.42s ease;
+    }
+    @keyframes correctFlash{
+      0%{ background: rgba(251,252,255,.94); }
+      40%{ background: #eafff0; }
+      100%{ background: rgba(251,252,255,.94); }
+    }
+
+    .token .miniBtn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:24px;
+      height:24px;
+      border:1px solid #dbe1ea;
+      background:#f8fafc;
+      border-radius:999px;
+      padding:0;
+      font-weight:950;
+      cursor:pointer;
+      line-height:1;
+      box-shadow:none;
+      opacity:0;
+      pointer-events:none;
+      transform: translateY(1px);
+      transition: opacity .16s ease, transform .16s ease, background .12s ease, border-color .12s ease;
+    }
+    .token .miniBtn:hover{
+      background:#eef2ff;
+      border-color:#c7d2fe;
+    }
+
+    /* Ve slovní bance nikdy neukazovat */
+    #bank .token .miniBtn{
+      display:none !important;
+    }
+
+    /* Ve skládání věty se ukážou až při hoveru nebo focusu */
+    #builder .token .miniBtn{
+      display:inline-flex;
+    }
+
+    @media (hover: hover) and (pointer: fine){
+      #builder .token:hover .miniBtn,
+      #builder .token:focus-within .miniBtn{
+        opacity:1;
+        pointer-events:auto;
+        transform: translateY(0);
+      }
+    }
+
+    /* Na dotykových zařízeních je radši necháme viditelné */
+    @media (hover: none), (pointer: coarse){
+      #builder .token .miniBtn{
+        opacity:1;
+        pointer-events:auto;
+        transform: translateY(0);
+      }
+    }
+
+    .controlsBar{
+      margin-top:12px;
+      display:flex; gap:10px; flex-wrap:wrap;
+      align-items:center; justify-content:space-between;
+    }
+    .controlsLeft, .controlsRight{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+
+    .status{
+      margin-top:12px;
+      border-radius:14px;
+      padding:12px 14px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.96);
+      box-shadow: var(--shadow2);
+      font-weight:950;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      line-height:1.25;
+    }
+    .status.good{ border-color:#b7e4c3; background:#f1fff4; color:var(--good); }
+    .status.warn{ border-color:#ffd7a8; background:#fff7ed; color:var(--warn); }
+    .status.bad{ border-color:#ffc6c6; background:#fff2f2; color:var(--bad); }
+    .status small{ font-weight:900; color:var(--muted); display:block; margin-top:6px; }
+
+    .kpi{
+      margin-top:10px;
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+      color:var(--muted);
+      font-weight:900;
+      font-size:12px;
+    }
+    .chip{
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.82);
+      border-radius:999px;
+      padding:6px 10px;
+      box-shadow: 0 3px 10px rgba(0,0,0,.04);
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+    }
+    .chip b{ color:#0f172a; }
+
+    .toggleRow{
+      display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+      margin-top:10px;
+    }
+    .switch{
+      display:flex; align-items:center; gap:10px;
+      font-weight:950; color:#0f172a;
+    }
+    .switch input{ width:18px; height:18px; }
+
+    .modalBack{
+      position:fixed; inset:0;
+      background: rgba(15,23,42,.50);
+      display:none;
+      z-index:50;
+      padding:18px;
+    }
+    .modalBack.show{ display:flex; align-items:center; justify-content:center; }
+    .modal{
+      width:min(720px, 100%);
+      background:white;
+      border-radius:18px;
+      border:1px solid #e5e7eb;
+      box-shadow: 0 22px 60px rgba(0,0,0,.22);
+      padding:16px;
+    }
+    .modal h2{ margin:0 0 8px; font-size:18px; }
+    .modal p{ margin:8px 0; color:#334155; font-weight:800; line-height:1.35; }
+    .modal ul{ margin:10px 0; padding-left:18px; color:#334155; font-weight:850; }
+    .modal .actions{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; margin-top:12px; }
+    .footerNote{
+      margin-top:12px;
+      color:var(--muted);
+      font-weight:850;
+      font-size:12px;
+      line-height:1.35;
+    }
+    .hidden{ display:none !important; }
+  </style>
+</head>
+
+<body>
+  <div id="bgFlag" class="bg-flag"></div>
+
+  <div class="wrap">
+    <h1>Demo zdarma (offline): skládání anglických vět</h1>
+    <div class="topHint">
+      Přetáhni slova z levého sloupce a slož správnou anglickou větu. Poslechni si výslovnost a zkus větu zopakovat nahlas.
+      <div class="tiny" style="margin-top:6px;">
+        Krok: 1) Přetáhni slova → 2) Vyhodnoť → 3) Přehrávej a opakuj
+      </div>
+    </div>
+
+    <div class="panelGrid">
+      <div class="card">
+        <div class="sectionTitle">
+          <span>Nastavení (demo)</span>
+          <span class="pill">offline</span>
+          <span class="pill">zdarma</span>
+        </div>
+
+        <div class="row2" style="margin-bottom:10px;">
+          <div>
+            <label for="levelSel">Úroveň</label>
+            <select id="levelSel">
+              <option value="A1">A1</option>
+              <option value="A2" selected>A2</option>
+              <option value="B1">B1</option>
+              <option value="B2">B2</option>
+              <option value="C1">C1</option>
+            </select>
+          </div>
+          <div>
+            <label for="topicSel">Téma</label>
+            <select id="topicSel"></select>
+          </div>
+        </div>
+
+        <div class="row2" style="margin-bottom:10px;">
+          <div>
+            <label>Režim hodnocení (cíl)</label>
+            <div class="seg" role="tablist" aria-label="Režim hodnocení">
+              <button id="modeComm" class="active" type="button" role="tab" aria-selected="true">Domluvit se 🗣️</button>
+              <button id="modeSchool" type="button" role="tab" aria-selected="false">Do školy 🎓</button>
+            </div>
+            <div class="tiny" style="margin-top:6px;">
+              Domluvit se = toleruje drobné chyby. Do školy = přísnější.
+            </div>
+          </div>
+          <div>
+            <label for="distrSel">Rušiče</label>
+            <select id="distrSel">
+              <option value="2" selected>2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+            </select>
+            <div class="tiny" style="margin-top:6px;">Rušiče = přesně tolik slov navíc.</div>
+          </div>
+        </div>
+
+        <label for="czInput">Zadání česky</label>
+        <textarea id="czInput" readonly>V demo verzi je generování cvičení z české věty dostupné pouze v placené variantě (AI).
+Vyzkoušej prosím předpřipravená cvičení.</textarea>
+
+        <div class="toggleRow">
+          <div class="switch">
+            <input type="checkbox" id="flagToggle" checked />
+            <label for="flagToggle" style="margin:0; font-size:13px;">Pozadí: britská vlajka</label>
+          </div>
+          <div class="switch">
+            <input type="checkbox" id="autoSpeakToggle" checked />
+            <label for="autoSpeakToggle" style="margin:0; font-size:13px;">Po správně: přehrát pomalu</label>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="btnRow">
+          <button id="createBtn" class="primary" type="button">Vytvořit cvičení</button>
+          <button id="nextBtnLeft" type="button">Nové cvičení</button>
+          <button id="resetProgBtn" class="danger" type="button" title="Vynuluje XP a progres v tomto prohlížeči">Reset XP</button>
+        </div>
+
+        <div class="note">
+          Demo obsahuje omezenou sadu vět a motivaci (XP). Plná verze s AI umí generovat neomezeně podle tématu, úrovně a chyb studenta.
+        </div>
+
+        <div class="footerNote">
+          Tip: Pokud ti demo dává smysl, AI verze bude teprve jízda (vysvětlení chyb, nové věty na míru, slovní zásoba podle potřeb).
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="sectionTitle">
+          <span>Cvičení</span>
+          <span id="pillTopic" class="pill">—</span>
+          <span id="pillLevel" class="pill">—</span>
+          <span id="pillMode" class="pill">Domluvit se</span>
+        </div>
+
+        <div class="kpi" style="margin-top:0;">
+          <span class="chip">⭐ XP: <b id="xpVal">0</b></span>
+          <span class="chip">🔥 Série: <b id="streakVal">0</b></span>
+          <span class="chip">🧪 Demo: <b id="demoDoneVal">0</b>/30</span>
+          <span class="chip">🏁 Level: <b id="lvlVal">1</b> (<span id="lvlProgText">0/200</span>)</span>
+        </div>
+
+        <div class="targetBox">
+          <div class="targetTopRow">
+            <div id="targetHint" class="targetHint">Slož větu a klikni „Vyhodnotit“.</div>
+            <div class="btnRow">
+              <button id="slowBtn" class="ghost" type="button" title="Pomalu (0,6)">Přehrát pomalu</button>
+              <button id="toggleTrBtn" class="warn" type="button">Zobrazit překlad</button>
+            </div>
+          </div>
+
+          <div class="builtRow">
+            <div class="builtSentence" id="builtSentence">
+              <span class="placeholder">— (zatím prázdné)</span>
+            </div>
+
+            <span id="speakerBtn" class="speaker" title="Přehrát">
+              🔊 <span class="tiny" style="font-weight:900;">Přehrát</span>
+            </span>
+          </div>
+
+          <div class="hintLine">Poslechni a opakuj nahlas.</div>
+          <div id="translation" class="translation"></div>
+        </div>
+
+        <div class="grid">
+          <div>
+            <div class="zoneTitleRow">
+              <div class="sectionTitle" style="margin:0;">Slovní banka</div>
+              <button id="shuffleBtn" type="button">Zamíchat</button>
+            </div>
+            <div id="bank" class="zone" aria-label="Slovní banka"></div>
+            <div class="hintLine">Pořadí je vždy rozházené a vždy jsou tam rušiče.</div>
+          </div>
+
+          <div>
+            <div class="zoneTitleRow">
+              <div class="sectionTitle" style="margin:0;">Skládání věty</div>
+              <div class="tiny">Slova lze měnit pořadí tažením. Šipky se ukážou až při najetí myší.</div>
+            </div>
+            <div id="builder" class="zone" aria-label="Skládání věty"></div>
+
+            <div class="controlsBar">
+              <div class="controlsLeft">
+                <button id="evalBtn" class="primary" type="button">Vyhodnotit</button>
+                <button id="hintBtn" class="warn" type="button">Srovnat (nápověda)</button>
+                <button id="clearBtn" class="danger" type="button">Vyčistit</button>
+              </div>
+              <div class="controlsRight">
+                <button id="nextBtn" type="button">Nové cvičení</button>
+              </div>
+            </div>
+
+            <div id="status" class="status">
+              <span>📌 Vyber úroveň a téma vlevo a klikni „Vytvořit cvičení“.</span>
+              <small id="statusDetail">—</small>
+            </div>
+
+            <div class="kpi" style="margin-top:10px;">
+              <span class="chip" id="chipLeft">Zbývá vložit: —</span>
+              <span class="chip" id="chipMode">Režim: Domluvit se</span>
+              <span class="chip" id="chipSlow">Pomalu: 0,6×</span>
+              <span class="chip" id="chipCorrectCount">Správná slova vložena: —</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div id="modalBack" class="modalBack" role="dialog" aria-modal="true" aria-label="Dokončeno demo">
+    <div class="modal">
+      <h2>Gratulujeme! 🎉 Dokončil jsi demo (30 správných vět).</h2>
+      <p>
+        Tohle byla offline ochutnávka. Plná verze s AI umí generovat neomezené množství cvičení a hlavně vysvětlí chyby tak,
+        aby ses rychle zlepšoval(a).
+      </p>
+      <ul>
+        <li>neomezené věty podle tématu a úrovně (A1–C1)</li>
+        <li>AI vysvětlení chyb + návrat do cvičení</li>
+        <li>trénink slovní zásoby na míru</li>
+        <li>chytré rušiče (typické záměny)</li>
+      </ul>
+      <p class="tiny">Demo můžeš dál používat, ale už jsi viděl(a) maximum. 😉</p>
+      <div class="actions">
+        <button id="closeModalBtn" type="button">Zavřít</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  "use strict";
+
+  const levelSel = document.getElementById("levelSel");
+  const topicSel = document.getElementById("topicSel");
+  const distrSel = document.getElementById("distrSel");
+
+  const modeCommBtn = document.getElementById("modeComm");
+  const modeSchoolBtn = document.getElementById("modeSchool");
+
+  const flagToggle = document.getElementById("flagToggle");
+  const bgFlag = document.getElementById("bgFlag");
+  const autoSpeakToggle = document.getElementById("autoSpeakToggle");
+
+  const createBtn = document.getElementById("createBtn");
+  const nextBtnLeft = document.getElementById("nextBtnLeft");
+  const nextBtn = document.getElementById("nextBtn");
+  const resetProgBtn = document.getElementById("resetProgBtn");
+
+  const pillTopic = document.getElementById("pillTopic");
+  const pillLevel = document.getElementById("pillLevel");
+  const pillMode = document.getElementById("pillMode");
+
+  const targetHint = document.getElementById("targetHint");
+  const builtSentenceEl = document.getElementById("builtSentence");
+  const translationEl = document.getElementById("translation");
+  const toggleTrBtn = document.getElementById("toggleTrBtn");
+
+  const speakerBtn = document.getElementById("speakerBtn");
+  const slowBtn = document.getElementById("slowBtn");
+
+  const bankEl = document.getElementById("bank");
+  const builderEl = document.getElementById("builder");
+  const shuffleBtn = document.getElementById("shuffleBtn");
+
+  const evalBtn = document.getElementById("evalBtn");
+  const hintBtn = document.getElementById("hintBtn");
+  const clearBtn = document.getElementById("clearBtn");
+
+  const statusEl = document.getElementById("status");
+  const statusDetail = document.getElementById("statusDetail");
+
+  const chipLeft = document.getElementById("chipLeft");
+  const chipMode = document.getElementById("chipMode");
+  const chipSlow = document.getElementById("chipSlow");
+  const chipCorrectCount = document.getElementById("chipCorrectCount");
+
+  const xpVal = document.getElementById("xpVal");
+  const streakVal = document.getElementById("streakVal");
+  const demoDoneVal = document.getElementById("demoDoneVal");
+  const lvlVal = document.getElementById("lvlVal");
+  const lvlProgText = document.getElementById("lvlProgText");
+
+  const modalBack = document.getElementById("modalBack");
+  const closeModalBtn = document.getElementById("closeModalBtn");
+
+  const DEMO_GOAL = 30;
+  const XP_PER_LEVEL = 200;
+  const SLOW_RATE = 0.6;
+
+  let mode = "comm";
+  let translationShown = false;
+  let preferredVoice = null;
+  let current = null;
+
+  const topicPointer = {};
+
+  const PROG_KEY = "fdc_sentence_demo_progress_v1";
+  let prog = {
+    xp: 0,
+    streak: 0,
+    demoDone: 0,
+    level: 1
+  };
+
+  const DB = {
+    A1: {
+      "present-simple": {
+        name: "Present Simple",
+        items: [
+          { en:"I go to school every day.", cz:"Chodím do školy každý den." },
+          { en:"They play football on Sunday.", cz:"V neděli hrají fotbal." },
+          { en:"He works in an office.", cz:"Pracuje v kanceláři." },
+          { en:"We watch movies on Friday evening.", cz:"V pátek večer se díváme na filmy." },
+          { en:"I like coffee in the morning.", cz:"Mám rád(a) kávu ráno." },
+          { en:"She speaks English at work.", cz:"Mluví anglicky v práci." }
+        ]
+      },
+      "present-continuous": {
+        name: "Present Continuous",
+        items: [
+          { en:"She is reading a book.", cz:"Ona právě čte knihu." },
+          { en:"We are cooking dinner tonight.", cz:"Dnes večer vaříme večeři." },
+          { en:"I am watching TV now.", cz:"Teď se dívám na televizi." },
+          { en:"They are playing in the park.", cz:"Hrají si v parku." },
+          { en:"He is working today.", cz:"Dnes pracuje." }
+        ]
+      },
+      "there-is-are": {
+        name: "There is / There are",
+        items: [
+          { en:"There is a book on the table.", cz:"Na stole je kniha." },
+          { en:"There are two chairs in the room.", cz:"V místnosti jsou dvě židle." },
+          { en:"There is a dog in the garden.", cz:"Na zahradě je pes." }
+        ]
+      }
+    },
+
+    A2: {
+      "past-simple": {
+        name: "Past Simple",
+        items: [
+          { en:"I went to school yesterday.", cz:"Včera jsem šel/šla do školy." },
+          { en:"She watched a movie last night.", cz:"Včera večer se dívala na film." },
+          { en:"We cooked dinner on Saturday.", cz:"V sobotu jsme vařili večeři." },
+          { en:"They played football in the morning.", cz:"Ráno hráli fotbal." },
+          { en:"He visited his friend last week.", cz:"Minulý týden navštívil kamaráda." }
+        ]
+      },
+      "present-perfect": {
+        name: "Present Perfect",
+        items: [
+          { en:"I have never been to London.", cz:"Nikdy jsem nebyl(a) v Londýně." },
+          { en:"She has already finished her homework.", cz:"Už dokončila domácí úkol." },
+          { en:"We have lived here for two years.", cz:"Žijeme tady už dva roky." },
+          { en:"They have just arrived.", cz:"Právě dorazili." }
+        ]
+      },
+      "future-going-to": {
+        name: "Going to",
+        items: [
+          { en:"I am going to visit my friend tomorrow.", cz:"Zítra se chystám navštívit kamaráda." },
+          { en:"We are going to buy a new car.", cz:"Chystáme se koupit nové auto." },
+          { en:"She is going to study tonight.", cz:"Dnes večer se bude učit." },
+          { en:"They are going to play football.", cz:"Chystají se hrát fotbal." }
+        ]
+      },
+      "conditionals-1": {
+        name: "1st Conditional",
+        items: [
+          { en:"If it rains, we will stay at home.", cz:"Když bude pršet, zůstaneme doma." },
+          { en:"If you study, you will pass the test.", cz:"Když se budeš učit, uděláš test." },
+          { en:"If I have time, I will call you.", cz:"Když budu mít čas, zavolám ti." },
+          { en:"If they come early, we will start.", cz:"Když přijdou brzy, začneme." }
+        ]
+      }
+    },
+
+    B1: {
+      "modals": {
+        name: "Modals (can / must / should)",
+        items: [
+          { en:"You should drink more water.", cz:"Měl(a) bys pít víc vody." },
+          { en:"I can help you with your homework.", cz:"Můžu ti pomoct s domácím úkolem." },
+          { en:"We must leave early tomorrow.", cz:"Zítra musíme odejít brzy." },
+          { en:"He can speak three languages.", cz:"Umí mluvit třemi jazyky." }
+        ]
+      },
+      "past-continuous": {
+        name: "Past Continuous",
+        items: [
+          { en:"I was working when you called me.", cz:"Pracoval(a) jsem, když jsi mi volal(a)." },
+          { en:"They were watching TV at eight o’clock.", cz:"V osm hodin se dívali na televizi." },
+          { en:"She was cooking while he was cleaning.", cz:"Vařila, zatímco on uklízel." }
+        ]
+      },
+      "relative-clauses": {
+        name: "Relative clauses",
+        items: [
+          { en:"This is the man who helped me yesterday.", cz:"Tohle je ten muž, který mi včera pomohl." },
+          { en:"I have a friend who lives in Brno.", cz:"Mám kamaráda, který žije v Brně." },
+          { en:"That is the book which I want to buy.", cz:"To je ta kniha, kterou chci koupit." }
+        ]
+      }
+    },
+
+    B2: {
+      "conditionals-2": {
+        name: "2nd Conditional",
+        items: [
+          { en:"If I had time, I would travel more.", cz:"Kdybych měl(a) čas, cestoval(a) bych víc." },
+          { en:"If she knew, she would tell you.", cz:"Kdyby věděla, řekla by ti to." },
+          { en:"If we lived near the sea, we would swim every day.", cz:"Kdybychom bydleli u moře, plavali bychom každý den." }
+        ]
+      },
+      "passive": {
+        name: "Passive voice",
+        items: [
+          { en:"The car was repaired yesterday.", cz:"Auto bylo včera opraveno." },
+          { en:"The meeting will be held next week.", cz:"Schůzka se bude konat příští týden." },
+          { en:"The email has been sent already.", cz:"E-mail už byl odeslán." }
+        ]
+      },
+      "reported-speech": {
+        name: "Reported speech",
+        items: [
+          { en:"He said that he was tired.", cz:"Řekl, že je unavený." },
+          { en:"She told me that she would come later.", cz:"Řekla mi, že přijde později." },
+          { en:"They said that they had finished.", cz:"Řekli, že skončili." }
+        ]
+      }
+    },
+
+    C1: {
+      "collocations": {
+        name: "Collocations",
+        items: [
+          { en:"We need to take into account the long-term costs.", cz:"Musíme vzít v úvahu dlouhodobé náklady." },
+          { en:"He raised a valid point during the discussion.", cz:"Během diskuse vznesl platný argument." },
+          { en:"She is highly skilled at solving complex problems.", cz:"Je velmi zdatná v řešení složitých problémů." }
+        ]
+      },
+      "complex-clauses": {
+        name: "Complex clauses",
+        items: [
+          { en:"Although it was late, we decided to continue.", cz:"Ačkoli bylo pozdě, rozhodli jsme se pokračovat." },
+          { en:"The more you practice, the better you will become.", cz:"Čím víc budeš trénovat, tím lepší budeš." },
+          { en:"Had I known earlier, I would have acted differently.", cz:"Kdybych to věděl(a) dřív, jednal(a) bych jinak." }
+        ]
+      }
+    }
+  };
+
+  const DISTRACTOR_POOLS = {
+    generic: ["always","never","already","just","yesterday","tomorrow","quickly","slowly","maybe","really","then","but","because","also","often","sometimes","usually","still","again","perhaps"],
+    articles: ["a","an","the"],
+    preps: ["in","on","at","to","for","with","from","about","into","over","under","between"],
+    helpers: ["do","does","did","have","has","had","will","would","can","could","should","must","am","is","are","was","were"],
+    time: ["now","today","tonight","last","next","week","month","morning","evening","night","soon"]
+  };
+
+  const QUICK_TIPS = [
+    "Tip: Základní pořadí je SUBJECT – VERB – OBJECT (podmět – sloveso – předmět).",
+    "Tip: 'always / often / never' většinou stojí před hlavním slovesem (I often go…).",
+    "Tip: U 'be' (am/is/are) stojí příslovce obvykle až za 'be' (She is always…).",
+    "Tip: Časové výrazy často dáváš na konec věty (…every day / …last week).",
+    "Tip: Člen 'a/an/the' bývá těsně před podstatným jménem (a book / the car).",
+    "Tip: Předložky (in/on/at) často rozhodují o významu – když si nejsi jistý, zkus jinou.",
+    "Tip: V otázkách a záporu v present simple často potřebuješ do/does (AI verze to vysvětlí do detailu)."
+  ];
+
+  const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
+  const clearZone = (z) => { while(z.firstChild) z.removeChild(z.firstChild); };
+
+  const shuffle = (arr) => {
+    const a = [...arr];
+    for(let i=a.length-1; i>0; i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  };
+
+  const normalizeSentence = (s) => (s||"")
+    .toLowerCase()
+    .replace(/\s+/g," ")
+    .replace(/\s+([.,!?;:])/g,"$1")
+    .trim();
+
+  const sentenceStringFromWords = (words) => {
+    let out = "";
+    for(const w of words){
+      if(!out) out = w;
+      else if (/^[\.\,\?\!\;\:]$/.test(w)) out += w;
+      else out += " " + w;
+    }
+    return out;
+  };
+
+  const wordsFromEN = (sentence) => {
+    const raw = sentence.trim()
+      .replace(/([.,!?;:])/g, " $1 ")
+      .replace(/\s+/g, " ")
+      .trim()
+      .split(" ");
+    return raw.filter(Boolean);
+  };
+
+  const tokenizeForMeaningCompare = (words) => {
+    const ignore = new Set(["a","an","the","to","in","on","at","of","for","with","is","are","am","was","were","do","does","did","have","has","had","will","would","can","could","should","must","that"]);
+    return words.map(w=>w.toLowerCase())
+      .filter(w=>!/^[.,!?;:]$/.test(w))
+      .filter(w=>!ignore.has(w));
+  };
+
+  const getWordsInZone = (zone) => [...zone.querySelectorAll(".token")].map(t => t.dataset.value);
+
+  const setStatus = (kind, main, detail="") => {
+    statusEl.classList.remove("good","warn","bad");
+    if(kind) statusEl.classList.add(kind);
+    statusEl.querySelector("span").textContent = main;
+    statusDetail.textContent = detail || "—";
+  };
+
+  const clearMarks = () => {
+    [...bankEl.querySelectorAll(".token"), ...builderEl.querySelectorAll(".token")]
+      .forEach(t => t.classList.remove("correct","wrong"));
+  };
+
+  const updateRemainingChip = () => {
+    if(!current){ chipLeft.textContent = "Zbývá vložit: —"; chipCorrectCount.textContent = "Správná slova vložena: —"; return; }
+    const expected = current.words.map(w=>w.toLowerCase());
+    const built = getWordsInZone(builderEl).map(w=>w.toLowerCase());
+    const bag = new Map();
+    for(const w of expected) bag.set(w, (bag.get(w)||0)+1);
+
+    let matchedNow = 0;
+    for(const w of built){
+      const n = bag.get(w)||0;
+      if(n>0){
+        matchedNow++;
+        bag.set(w, n-1);
+      }
+    }
+    let remaining = 0;
+    for(const n of bag.values()) remaining += n;
+
+    chipLeft.textContent = `Zbývá vložit: ${remaining}`;
+    chipCorrectCount.textContent = `Správná slova vložena: ${matchedNow}/${expected.length}`;
+  };
+
+  const updateBuiltSentence = () => {
+    const words = getWordsInZone(builderEl);
+    const s = sentenceStringFromWords(words).trim();
+    builtSentenceEl.innerHTML = "";
+    if(!s){
+      const ph = document.createElement("span");
+      ph.className = "placeholder";
+      ph.textContent = "— (zatím prázdné)";
+      builtSentenceEl.appendChild(ph);
+    } else {
+      builtSentenceEl.textContent = s;
+    }
+    updateRemainingChip();
+  };
+
+  const loadProg = () => {
+    try{
+      const raw = localStorage.getItem(PROG_KEY);
+      if(raw){
+        const obj = JSON.parse(raw);
+        if(obj && typeof obj === "object"){
+          prog = {
+            xp: Number(obj.xp||0),
+            streak: Number(obj.streak||0),
+            demoDone: Number(obj.demoDone||0),
+            level: Number(obj.level||1)
+          };
+        }
+      }
+    }catch(_){}
+    recomputeLevelFromXP();
+    renderProg();
+  };
+
+  const saveProg = () => {
+    try{ localStorage.setItem(PROG_KEY, JSON.stringify(prog)); }catch(_){}
+  };
+
+  const recomputeLevelFromXP = () => {
+    const xp = Math.max(0, Number(prog.xp||0));
+    const lvl = Math.floor(xp / XP_PER_LEVEL) + 1;
+    prog.level = Math.max(1, lvl);
+  };
+
+  const renderProg = () => {
+    xpVal.textContent = String(prog.xp);
+    streakVal.textContent = String(prog.streak);
+    demoDoneVal.textContent = String(clamp(prog.demoDone, 0, 9999));
+    lvlVal.textContent = String(prog.level);
+
+    const inLevel = prog.xp % XP_PER_LEVEL;
+    lvlProgText.textContent = `${inLevel}/${XP_PER_LEVEL}`;
+    demoDoneVal.textContent = String(Math.min(prog.demoDone, DEMO_GOAL));
+  };
+
+  const addXP = (amount) => {
+    prog.xp = Math.max(0, prog.xp + Math.max(0, Math.floor(amount)));
+    recomputeLevelFromXP();
+    saveProg();
+    renderProg();
+  };
+
+  const setStreak = (n) => {
+    prog.streak = Math.max(0, Math.floor(n));
+    saveProg();
+    renderProg();
+  };
+
+  const incDemoDone = () => {
+    prog.demoDone = Math.max(0, prog.demoDone + 1);
+    saveProg();
+    renderProg();
+    if(prog.demoDone === DEMO_GOAL){
+      showModal();
+    }
+  };
+
+  const resetProg = () => {
+    if(!confirm("Opravdu chceš vynulovat XP a progres v tomto prohlížeči?")) return;
+    prog = { xp:0, streak:0, demoDone:0, level:1 };
+    saveProg();
+    renderProg();
+    setStatus("", "Resetováno. Vyber úroveň/téma a klikni „Vytvořit cvičení“.", "—");
+  };
+
+  const showModal = () => modalBack.classList.add("show");
+  const hideModal = () => modalBack.classList.remove("show");
+
+  const refreshTopics = () => {
+    const level = levelSel.value;
+    const topics = DB[level] || {};
+    const keys = Object.keys(topics);
+    const prev = topicSel.value;
+
+    topicSel.innerHTML = "";
+    for(const k of keys){
+      const opt = document.createElement("option");
+      opt.value = k;
+      opt.textContent = topics[k].name;
+      topicSel.appendChild(opt);
+    }
+    if(prev && keys.includes(prev)) topicSel.value = prev;
+  };
+
+  const setMode = (m) => {
+    mode = m;
+    const isComm = mode === "comm";
+    modeCommBtn.classList.toggle("active", isComm);
+    modeSchoolBtn.classList.toggle("active", !isComm);
+    modeCommBtn.setAttribute("aria-selected", String(isComm));
+    modeSchoolBtn.setAttribute("aria-selected", String(!isComm));
+    pillMode.textContent = isComm ? "Domluvit se" : "Do školy";
+    chipMode.textContent = "Režim: " + (isComm ? "Domluvit se" : "Do školy");
+    if(current){
+      setStatus("", "📌 Slož větu a klikni „Vyhodnotit“.", isComm
+        ? "Cíl: domluvit se — toleruje drobné chyby."
+        : "Cíl: do školy — přísnější hodnocení."
+      );
+    }
+  };
+
+  const pickPreferredVoice = () => {
+    const synth = window.speechSynthesis;
+    if(!synth) return null;
+    const voices = synth.getVoices() || [];
+    const vGB = voices.find(v => (v.lang||"").toLowerCase().startsWith("en-gb"));
+    const vUS = voices.find(v => (v.lang||"").toLowerCase().startsWith("en-us"));
+    const vEN = voices.find(v => (v.lang||"").toLowerCase().startsWith("en"));
+    return vGB || vUS || vEN || null;
+  };
+
+  const speak = (text, rate=1.0) => {
+    const synth = window.speechSynthesis;
+    if(!synth || !window.SpeechSynthesisUtterance){
+      setStatus("warn","⚠️ Prohlížeč nepodporuje čtení nahlas (Web Speech API).", "Zkus Chrome/Edge.");
+      return;
+    }
+    synth.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.rate = rate;
+    if(!preferredVoice) preferredVoice = pickPreferredVoice();
+    if(preferredVoice) u.voice = preferredVoice;
+    synth.speak(u);
+  };
+
+  if("speechSynthesis" in window){
+    window.speechSynthesis.onvoiceschanged = () => preferredVoice = pickPreferredVoice();
+  }
+  preferredVoice = pickPreferredVoice();
+  chipSlow.textContent = `Pomalu: ${String(SLOW_RATE).replace(".",",")}×`;
+
+  const makeToken = (text) => {
+    const el = document.createElement("div");
+    el.className = "token";
+    el.draggable = true;
+    el.dataset.value = text;
+    el.tabIndex = 0;
+
+    const leftBtn = document.createElement("button");
+    leftBtn.className = "miniBtn";
+    leftBtn.type = "button";
+    leftBtn.textContent = "←";
+    leftBtn.title = "Posunout doleva";
+
+    const rightBtn = document.createElement("button");
+    rightBtn.className = "miniBtn";
+    rightBtn.type = "button";
+    rightBtn.textContent = "→";
+    rightBtn.title = "Posunout doprava";
+
+    const span = document.createElement("span");
+    span.textContent = text;
+
+    el.appendChild(leftBtn);
+    el.appendChild(rightBtn);
+    el.appendChild(span);
+
+    el.addEventListener("dragstart", (e) => {
+      el.classList.add("dragging");
+      e.dataTransfer.setData("text/plain","token");
+      e.dataTransfer.effectAllowed = "move";
+    });
+    el.addEventListener("dragend", () => {
+      el.classList.remove("dragging");
+      updateBuiltSentence();
+    });
+
+    el.addEventListener("click", (e) => {
+      if(e.target === leftBtn || e.target === rightBtn) return;
+      const parent = el.parentElement;
+      if(parent === bankEl) builderEl.appendChild(el);
+      else bankEl.appendChild(el);
+      clearMarks();
+      setStatus("", "📌 Slož větu a klikni „Vyhodnotit“.", "Tip: slova lze přesouvat i klepnutím.");
+      updateBuiltSentence();
+    });
+
+    leftBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if(el.parentElement !== builderEl) return;
+      const prev = el.previousElementSibling;
+      if(prev) builderEl.insertBefore(el, prev);
+      clearMarks();
+      updateBuiltSentence();
+    });
+
+    rightBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if(el.parentElement !== builderEl) return;
+      const next = el.nextElementSibling;
+      if(next) builderEl.insertBefore(next, el);
+      clearMarks();
+      updateBuiltSentence();
+    });
+
+    return el;
+  };
+
+  const getClosestToken = (container, x, y) => {
+    const tokens = [...container.querySelectorAll(".token:not(.dragging)")];
+    if(tokens.length === 0) return null;
+    let best = { dist: Infinity, el: null };
+    for(const t of tokens){
+      const r = t.getBoundingClientRect();
+      const cx = r.left + r.width/2;
+      const cy = r.top + r.height/2;
+      const d = Math.hypot(x - cx, y - cy);
+      if(d < best.dist){ best = { dist:d, el:t }; }
+    }
+    return best.el;
+  };
+
+  const enableDropZone = (zone) => {
+    zone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      zone.classList.add("isOver");
+      const dragging = document.querySelector(".token.dragging");
+      if(!dragging) return;
+      const afterEl = getClosestToken(zone, e.clientX, e.clientY);
+      if(afterEl == null) zone.appendChild(dragging);
+      else zone.insertBefore(dragging, afterEl);
+    });
+    zone.addEventListener("dragleave", () => zone.classList.remove("isOver"));
+    zone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      zone.classList.remove("isOver");
+      clearMarks();
+      setStatus("", "📌 Slož větu a klikni „Vyhodnotit“.");
+      updateBuiltSentence();
+    });
+  };
+
+  enableDropZone(bankEl);
+  enableDropZone(builderEl);
+
+  const getPoolFor = (topicKey, level) => {
+    const pools = [];
+    pools.push(...DISTRACTOR_POOLS.generic);
+
+    if(topicKey.includes("present")) pools.push("yesterday","last","ago");
+    if(topicKey.includes("past")) pools.push("now","today","tomorrow");
+    if(topicKey.includes("perfect")) pools.push("yesterday","last","ago","did","was");
+    if(topicKey.includes("conditionals")) pools.push("maybe","then","because","unless","if");
+    if(topicKey.includes("passive")) pools.push("by","from","to","with");
+    if(topicKey.includes("reported")) pools.push("say","tell","told","said","that");
+    if(topicKey.includes("there")) pools.push("is","are","a","the","in","on","at");
+
+    if(level === "A1" || level === "A2"){
+      pools.push(...DISTRACTOR_POOLS.articles, ...DISTRACTOR_POOLS.preps);
+    } else {
+      pools.push(...DISTRACTOR_POOLS.articles, ...DISTRACTOR_POOLS.preps, ...DISTRACTOR_POOLS.helpers);
+    }
+    pools.push(...DISTRACTOR_POOLS.time);
+
+    return [...new Set(pools)];
+  };
+
+  const pickDistractorsExact = (count, forbiddenSet, pool) => {
+    const candidates = pool.filter(w => !forbiddenSet.has(w.toLowerCase()));
+    const picked = [];
+    for(const w of shuffle(candidates)){
+      if(picked.length >= count) break;
+      if(!picked.map(x=>x.toLowerCase()).includes(w.toLowerCase())) picked.push(w);
+    }
+    const fallback = ["maybe","really","sometimes","usually","already","never","then","also","because","quickly","slowly"];
+    let i = 0;
+    while(picked.length < count){
+      const w = fallback[i++ % fallback.length];
+      if(!forbiddenSet.has(w.toLowerCase()) && !picked.includes(w)) picked.push(w);
+    }
+    return picked.slice(0, count);
+  };
+
+  const getNextItem = (level, topicKey) => {
+    const topic = DB[level]?.[topicKey];
+    if(!topic || !topic.items || topic.items.length === 0) return null;
+    const items = topic.items;
+
+    const key = `${level}|${topicKey}`;
+    if(!(key in topicPointer)){
+      topicPointer[key] = Math.floor(Math.random() * items.length);
+    }
+    const idx0 = topicPointer[key] % items.length;
+    topicPointer[key]++;
+
+    return { item: items[idx0], idx: idx0+1, total: items.length, topicName: topic.name };
+  };
+
+  const buildExerciseFromItem = (level, topicKey, topicName, en, cz, idx, total) => {
+    const words = wordsFromEN(en);
+    const forbidden = new Set(words.map(w => w.toLowerCase()));
+    const distractCount = Number(distrSel.value || 2);
+    const pool = getPoolFor(topicKey, level);
+    const distractors = pickDistractorsExact(distractCount, forbidden, pool);
+    return { level, topicKey, topicName, targetEN: en, translationCZ: cz, words, distractors, idx, total };
+  };
+
+  const loadExercise = (ex) => {
+    current = ex;
+
+    pillTopic.textContent = ex.topicName;
+    pillLevel.textContent = ex.level;
+    pillMode.textContent = (mode === "comm") ? "Domluvit se" : "Do školy";
+    chipMode.textContent = "Režim: " + ((mode === "comm") ? "Domluvit se" : "Do školy");
+
+    translationShown = false;
+    translationEl.textContent = ex.translationCZ || "(bez překladu)";
+    translationEl.classList.remove("show");
+    toggleTrBtn.textContent = "Zobrazit překlad";
+
+    clearZone(bankEl);
+    clearZone(builderEl);
+    clearMarks();
+
+    const bankWords = shuffle([...ex.words, ...ex.distractors]);
+    bankWords.forEach(w => bankEl.appendChild(makeToken(w)));
+
+    updateBuiltSentence();
+
+    targetHint.textContent = "Slož větu a klikni „Vyhodnotit“.";
+    setStatus("", "✅ Cvičení připraveno. Teď skládej.", `Věta ${ex.idx}/${ex.total} • Rušiče: ${ex.distractors.length}/${Number(distrSel.value || 2)} • Úroveň: ${ex.level}`);
+  };
+
+  const randTip = () => QUICK_TIPS[Math.floor(Math.random() * QUICK_TIPS.length)];
+
+  const buildFeedbackForSchool = (builtWords) => {
+    const built = builtWords.map(w=>w.toLowerCase());
+    const target = current.words.map(w=>w.toLowerCase());
+
+    const missing = [];
+    const bag = new Map();
+    for(const w of target) bag.set(w, (bag.get(w)||0)+1);
+    for(const w of built){
+      const n = bag.get(w)||0;
+      if(n>0) bag.set(w, n-1);
+    }
+    for(const [w,n] of bag.entries()){
+      if(n>0 && !/^[.,!?;:]$/.test(w)) missing.push(w);
+    }
+
+    const functionWords = ["a","an","the","to","in","on","at","for","with","have","has","had","am","is","are","was","were","will","would","do","does","did"];
+    const missingFunc = missing.filter(w=>functionWords.includes(w)).slice(0,3);
+    const missingContent = missing.filter(w=>!functionWords.includes(w)).slice(0,3);
+
+    if(missingContent.length) return `Chybí ti klíčové slovo(a): ${missingContent.join(", ")}.`;
+    if(missingFunc.length) return `Pozor na gramatiku: chybí ${missingFunc.join(", ")}.`;
+    return "Zkus doladit slovosled a drobnou gramatiku.";
+  };
+
+  const buildFeedbackForComm = (builtWords) => {
+    const builtMeaning = tokenizeForMeaningCompare(builtWords);
+    const targetMeaning = tokenizeForMeaningCompare(current.words);
+    const targetSet = new Set(targetMeaning);
+    const wrong = builtMeaning.filter(w=>!targetSet.has(w));
+    if(wrong.length) return `Možná máš navíc/špatně: ${wrong.slice(0,3).join(", ")}.`;
+    if(builtMeaning.length < Math.max(2, Math.floor(targetMeaning.length*0.6))) return "Chybí ti část významu (zkus doplnit hlavní slova).";
+    return "Je to skoro ono – doladíš slovosled a bude to.";
+  };
+
+  const awardForGreen = () => {
+    let xp = 10;
+    const nextStreak = prog.streak + 1;
+    if(nextStreak >= 5) xp += 10;
+    else if(nextStreak >= 3) xp += 5;
+    if(mode === "school") xp += 2;
+
+    setStreak(nextStreak);
+    addXP(xp);
+
+    if(prog.demoDone < DEMO_GOAL) incDemoDone();
+
+    return xp;
+  };
+
+  const punishForWrong = () => {
+    setStreak(0);
+  };
+
+  const evaluate = () => {
+    if(!current){
+      setStatus("warn","🟨 Nejdřív vytvoř cvičení.", "Vyber úroveň, téma a klikni „Vytvořit cvičení“.");
+      return;
+    }
+    clearMarks();
+
+    const builtWords = getWordsInZone(builderEl);
+    const builtStr = normalizeSentence(sentenceStringFromWords(builtWords));
+    const targetStr = normalizeSentence(current.targetEN);
+
+    if(builtStr === targetStr){
+      [...builderEl.querySelectorAll(".token")].forEach(t => t.classList.add("correct"));
+      builderEl.classList.remove("correctFlash");
+      void builderEl.offsetWidth;
+      builderEl.classList.add("correctFlash");
+
+      const earned = awardForGreen();
+      targetHint.textContent = "Hotovo. Super! Teď si větu přehraj a zopakuj nahlas.";
+      setStatus("good", `🟩 Gramaticky správně. Super! (+${earned} XP)`, `🔥 Série: ${prog.streak} • ⭐ XP: ${prog.xp} • 🧪 Demo: ${Math.min(prog.demoDone, DEMO_GOAL)}/${DEMO_GOAL}`);
+
+      if(autoSpeakToggle.checked){
+        speak(builtStr, SLOW_RATE);
+      }
+      return;
+    }
+
+    const expectedMeaning = tokenizeForMeaningCompare(current.words);
+    const builtMeaning = tokenizeForMeaningCompare(builtWords);
+
+    const bag = new Map();
+    for(const w of builtMeaning) bag.set(w, (bag.get(w)||0)+1);
+
+    let matched = 0;
+    for(const w of expectedMeaning){
+      const n = bag.get(w)||0;
+      if(n>0){ matched++; bag.set(w, n-1); }
+    }
+    const coverage = expectedMeaning.length ? (matched / expectedMeaning.length) : 0;
+
+    const expectedSet = new Set(expectedMeaning);
+    const wrongMeaningCount = builtMeaning.filter(w => !expectedSet.has(w)).length;
+
+    const expected = current.words;
+    [...builderEl.querySelectorAll(".token")].forEach((t, i) => {
+      const ok = expected[i] === t.dataset.value;
+      t.classList.add(ok ? "correct" : "wrong");
+    });
+
+    punishForWrong();
+
+    if(mode === "comm"){
+      if(coverage >= 0.65 && wrongMeaningCount <= 2){
+        targetHint.textContent = "Je to srozumitelné, ale chce to doladit (slovosled/gramatika).";
+        setStatus("warn","🟨 Srozumitelné, ale gramaticky nic moc.", buildFeedbackForComm(builtWords) + " " + randTip());
+        return;
+      }
+      targetHint.textContent = "Zkus to ještě jednou. Kdyžtak použij „Srovnat (nápověda)“.";
+      setStatus("bad","🟥 Tohle je špatně.", buildFeedbackForComm(builtWords) + " " + randTip());
+      return;
+    } else {
+      if(coverage >= 0.80 && wrongMeaningCount <= 1){
+        targetHint.textContent = "Skoro! Chybí detail (slovosled/gramatika).";
+        setStatus("warn","🟨 Skoro správně, ale do školy ještě doladit.", buildFeedbackForSchool(builtWords) + " " + randTip());
+        return;
+      }
+      targetHint.textContent = "Zkus to znovu. Kdyžtak použij „Srovnat (nápověda)“.";
+      setStatus("bad","🟥 Tohle je špatně.", buildFeedbackForSchool(builtWords) + " " + randTip());
+      return;
+    }
+  };
+
+  const hintAlign = () => {
+    if(!current){
+      setStatus("warn","🟨 Nejdřív vytvoř cvičení.", "Pak teprve má smysl nápověda.");
+      return;
+    }
+    clearMarks();
+
+    const allTokens = [...bankEl.querySelectorAll(".token"), ...builderEl.querySelectorAll(".token")];
+    const byWord = new Map();
+    for(const t of allTokens){
+      const w = t.dataset.value;
+      if(!byWord.has(w)) byWord.set(w, []);
+      byWord.get(w).push(t);
+    }
+
+    clearZone(builderEl);
+    for(const w of current.words){
+      const list = byWord.get(w) || [];
+      builderEl.appendChild(list.shift() || makeToken(w));
+    }
+
+    clearZone(bankEl);
+    const remainingTokens = [];
+    for(const list of byWord.values()){
+      for(const t of list) remainingTokens.push(t);
+    }
+    shuffle(remainingTokens).forEach(t => bankEl.appendChild(t));
+
+    targetHint.textContent = "Nápověda použita. Teď klikni „Vyhodnotit“ (a zkus si větu přehrát).";
+    setStatus("warn","🟨 Srovnáno (nápověda).", "Rušiče zůstaly v bance.");
+    clearMarks();
+    updateBuiltSentence();
+  };
+
+  const clearBuilder = () => {
+    [...builderEl.querySelectorAll(".token")].forEach(t => bankEl.appendChild(t));
+    clearMarks();
+    setStatus("", "📌 Vyčištěno. Zkus to znovu.", "Tip: klepnutím slovo přesuneš.");
+    updateBuiltSentence();
+  };
+
+  const shuffleBank = () => {
+    const tokens = [...bankEl.querySelectorAll(".token")];
+    clearZone(bankEl);
+    shuffle(tokens).forEach(t => bankEl.appendChild(t));
+    clearMarks();
+    setStatus("", "📌 Zamícháno.", "Banka je znovu zamíchaná.");
+  };
+
+  const toggleTranslation = () => {
+    if(!current){
+      setStatus("warn","🟨 Nejdřív vytvoř cvičení.", "Pak můžeš zobrazit překlad.");
+      return;
+    }
+    translationShown = !translationShown;
+    translationEl.classList.toggle("show", translationShown);
+    toggleTrBtn.textContent = translationShown ? "Skrýt překlad" : "Zobrazit překlad";
+  };
+
+  const getBuiltTextOrWarn = () => {
+    const s = sentenceStringFromWords(getWordsInZone(builderEl)).trim();
+    if(!s){
+      setStatus("warn","🟨 Nejdřív slož větu.", "Pak ji můžeš přehrát.");
+      return null;
+    }
+    return s;
+  };
+
+  const speakNormal = () => {
+    const s = getBuiltTextOrWarn(); if(!s) return;
+    speak(s, 1.0);
+  };
+  const speakSlow = () => {
+    const s = getBuiltTextOrWarn(); if(!s) return;
+    speak(s, SLOW_RATE);
+  };
+
+  const createFromDB = () => {
+    const level = levelSel.value;
+    const topicKey = topicSel.value;
+    const picked = getNextItem(level, topicKey);
+    if(!picked){
+      setStatus("bad","🟥 Pro tohle téma nemám data.", "Zkus jiné téma/úroveň.");
+      return;
+    }
+    const ex = buildExerciseFromItem(level, topicKey, picked.topicName, picked.item.en, picked.item.cz, picked.idx, picked.total);
+    loadExercise(ex);
+  };
+
+  const nextExercise = () => createFromDB();
+
+  levelSel.addEventListener("change", () => {
+    refreshTopics();
+    setStatus("", "📌 Vyber téma a klikni „Vytvořit cvičení“.", "Změnila se úroveň.");
+  });
+
+  topicSel.addEventListener("change", () => {
+    setStatus("", "📌 Klikni „Vytvořit cvičení“.", "Změnilo se téma.");
+  });
+
+  modeCommBtn.addEventListener("click", () => setMode("comm"));
+  modeSchoolBtn.addEventListener("click", () => setMode("school"));
+
+  flagToggle.addEventListener("change", () => {
+    bgFlag.style.display = flagToggle.checked ? "block" : "none";
+  });
+
+  createBtn.addEventListener("click", createFromDB);
+  nextBtnLeft.addEventListener("click", nextExercise);
+  nextBtn.addEventListener("click", nextExercise);
+
+  shuffleBtn.addEventListener("click", shuffleBank);
+  clearBtn.addEventListener("click", clearBuilder);
+
+  toggleTrBtn.addEventListener("click", toggleTranslation);
+
+  evalBtn.addEventListener("click", evaluate);
+  hintBtn.addEventListener("click", hintAlign);
+
+  speakerBtn.addEventListener("click", speakNormal);
+  slowBtn.addEventListener("click", speakSlow);
+
+  distrSel.addEventListener("change", () => {
+    if(current){
+      setStatus("", "⚙️ Počet rušičů se použije v dalším cvičení.", "Klikni „Nové cvičení“ nebo „Vytvořit cvičení“.");
+    }
+  });
+
+  resetProgBtn.addEventListener("click", resetProg);
+
+  closeModalBtn.addEventListener("click", hideModal);
+  modalBack.addEventListener("click", (e) => { if(e.target === modalBack) hideModal(); });
+  document.addEventListener("keydown", (e) => { if(e.key === "Escape") hideModal(); });
+
+  const init = () => {
+    loadProg();
+    refreshTopics();
+    setMode("comm");
+    bgFlag.style.display = flagToggle.checked ? "block" : "none";
+    setStatus("", "📌 Vyber úroveň a téma vlevo a klikni „Vytvořit cvičení“.", "Cílová anglická věta se v demu neukazuje předem.");
+    updateBuiltSentence();
+  };
+
+  init();
+})();
+</script>
+</body>
+</html>
