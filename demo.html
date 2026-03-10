@@ -590,7 +590,13 @@ Vyzkoušej prosím předpřipravená cvičení.</textarea>
 <script>
 (() => {
   "use strict";
-
+const apiState = {
+  level: "A1",
+  topic: "present-simple",
+  sentenceCs: "",
+  usedIds: [],
+  currentExercise: null
+};
   const levelSel = document.getElementById("levelSel");
   const topicSel = document.getElementById("topicSel");
   const distrSel = document.getElementById("distrSel");
