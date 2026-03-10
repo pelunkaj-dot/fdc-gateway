@@ -1492,7 +1492,15 @@ const apiState = {
     bgFlag.style.display = flagToggle.checked ? "block" : "none";
   });
 
-  createBtn.addEventListener("click", createFromDB);
+createBtn.addEventListener("click", async () => {
+
+  const ex = await fetchExerciseFromApi();
+
+  if (!ex) return;
+
+  console.log("Exercise from API:", ex);
+
+});
   nextBtnLeft.addEventListener("click", nextExercise);
   nextBtn.addEventListener("click", nextExercise);
 
