@@ -1573,6 +1573,41 @@ createBtn.addEventListener("click", async () => {
 
   return data;
 }
+  async function fetchExerciseFromApi() {
+
+  const payload = {
+    level: levelSel.value,
+    topic: topicSel.value,
+    sourceType: "preset",
+    usedIds: apiState.usedIds
+  };
+
+  const res = await fetch("/api/exercise", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  });
+
+  if (!res.ok) {
+    const errText = await res.text();
+    console.error("API error:", errText);
+    return null;
+  }
+
+  const data = await res.json();
+
+  apiState.currentExercise = data;
+
+  if (data.id && !apiState.usedIds.includes(data.id)) {
+    apiState.usedIds.push(data.id);
+  }
+
+  console.log("Exercise from API:", data);
+
+  return data;
+}
   init();
 })();
 </script>
