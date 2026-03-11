@@ -1545,7 +1545,36 @@ A1: {
   flagToggle.addEventListener("change", () => {
     bgFlag.style.display = flagToggle.checked ? "block" : "none";
   });
+createTopicBtn.addEventListener("click", async () => {
 
+  apiState.sentenceCs = "";
+
+  const ex = await fetchExerciseFromApi();
+
+  if (!ex) return;
+
+  loadExercise(ex);
+
+});
+
+createCustomBtn.addEventListener("click", async () => {
+
+  const sentence = document.getElementById("customSentence").value.trim();
+
+  if (!sentence) {
+    setStatus("bad","🟥 Napiš nejdřív českou větu.","");
+    return;
+  }
+
+  apiState.sentenceCs = sentence;
+
+  const ex = await fetchExerciseFromApi();
+
+  if (!ex) return;
+
+  loadExercise(ex);
+
+});
   nextBtnLeft.addEventListener("click", nextExercise);
   nextBtn.addEventListener("click", nextExercise);
 
