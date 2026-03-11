@@ -1462,17 +1462,16 @@ const apiState = {
     speak(s, SLOW_RATE);
   };
 
-  const createFromDB = () => {
-    const level = levelSel.value;
-    const topicKey = topicSel.value;
-    const picked = getNextItem(level, topicKey);
-    if(!picked){
-      setStatus("bad","🟥 Pro tohle téma nemám data.", "Zkus jiné téma/úroveň.");
-      return;
-    }
-    const ex = buildExerciseFromItem(level, topicKey, picked.topicName, picked.item.en, picked.item.cz, picked.idx, picked.total);
-    loadExercise(ex);
-  };
+  const createFromDB = async () => {
+  const ex = await fetchExerciseFromApi();
+
+  if (!ex) {
+    setStatus("bad", "🟥 Cvičení se nepodařilo načíst.", "Zkus to znovu.");
+    return;
+  }
+
+  loadExercise(ex);
+};
 
   const nextExercise = () => createFromDB();
 
