@@ -1624,7 +1624,7 @@ if (sentence) {
   payload.sentenceCs = sentence;
   }
 
-  const res = await fetch("/api/exercise", {
+const res = await fetch("https://fdc-gateway.vercel.app/api/exercise", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
