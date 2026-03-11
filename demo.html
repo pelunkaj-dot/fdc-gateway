@@ -1578,11 +1578,11 @@ createBtn.addEventListener("click", async () => {
   console.log("DEBUG level/topic:", levelSel.value, topicSel.value);
     
   const payload = {
-    level: levelSel.value,
-    topic: topicSel.value,
-    sourceType: "preset",
-    usedIds: apiState.usedIds
-  };
+  level: "A1",
+  topic: "present-simple",
+  sourceType: "preset",
+  usedIds: []
+};
 
   const res = await fetch("/api/exercise", {
     method: "POST",
