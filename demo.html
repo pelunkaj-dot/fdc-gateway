@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Demo zdarma (offline) – Skládání anglických vět</title>
+  <title>FajnCvičebna – demo zdarma</title>
   <style>
     :root{
       --bg:#f6f7fb; --card:#ffffff; --text:#111827; --muted:#6b7280;
@@ -22,7 +22,6 @@
       overflow-x:hidden;
     }
 
-    /* Zvýrazněná, ale pořád jemná britská vlajka */
     .bg-flag{
       position:fixed; inset:0;
       pointer-events:none;
@@ -74,11 +73,6 @@
       background:white;
     }
     textarea{ min-height:84px; resize:vertical; font-weight:750; }
-    textarea[readonly]{
-      background:#f8fafc;
-      color:#0f172a;
-      cursor:not-allowed;
-    }
     select{
       width:100%;
       border:1px solid #d7daea; border-radius:14px; padding:10px 12px;
@@ -274,12 +268,10 @@
       border-color:#c7d2fe;
     }
 
-    /* Ve slovní bance nikdy neukazovat */
     #bank .token .miniBtn{
       display:none !important;
     }
 
-    /* Ve skládání věty se ukážou až při hoveru nebo focusu */
     #builder .token .miniBtn{
       display:inline-flex;
     }
@@ -293,7 +285,6 @@
       }
     }
 
-    /* Na dotykových zařízeních je radši necháme viditelné */
     @media (hover: none), (pointer: coarse){
       #builder .token .miniBtn{
         opacity:1;
@@ -388,7 +379,6 @@
       font-size:12px;
       line-height:1.35;
     }
-    .hidden{ display:none !important; }
   </style>
 </head>
 
@@ -396,20 +386,20 @@
   <div id="bgFlag" class="bg-flag"></div>
 
   <div class="wrap">
-    <h1>Demo zdarma (offline): skládání anglických vět</h1>
+    <h1>FajnCvičebna – demo zdarma</h1>
     <div class="topHint">
       Přetáhni slova z levého sloupce a slož správnou anglickou větu. Poslechni si výslovnost a zkus větu zopakovat nahlas.
       <div class="tiny" style="margin-top:6px;">
-        Krok: 1) Přetáhni slova → 2) Vyhodnoť → 3) Přehrávej a opakuj
+        Krok: 1) Vyber téma nebo napiš vlastní větu → 2) Vytvoř cvičení → 3) Vyhodnoť → 4) Poslechni a opakuj
       </div>
     </div>
 
     <div class="panelGrid">
       <div class="card">
         <div class="sectionTitle">
-          <span>Nastavení (demo)</span>
-          <span class="pill">offline</span>
-          <span class="pill">zdarma</span>
+          <span>Nastavení</span>
+          <span class="pill">demo</span>
+          <span class="pill">AI</span>
         </div>
 
         <div class="row2" style="margin-bottom:10px;">
@@ -417,29 +407,27 @@
             <label for="levelSel">Úroveň</label>
             <select id="levelSel">
               <option value="A1" selected>A1</option>
-             <option value="A2">A2</option>
+              <option value="A2">A2</option>
               <option value="B1">B1</option>
               <option value="B2">B2</option>
               <option value="C1">C1</option>
             </select>
           </div>
           <div>
-            <div style="margin-bottom:10px;">
-
-</div>
             <label for="topicSel">Téma</label>
             <select id="topicSel"></select>
-            <div style="margin-top:10px;">
-  <label for="customSentence">Vlastní věta (volitelné)</label>
-  <input 
-    id="customSentence" 
-    type="text" 
-    placeholder="Např.: Včera jsem šel do školy."
-    style="width:100%; padding:6px;"
-  />
- <div class="tiny" style="margin-top:6px;">Napiš vlastní českou větu a klikni na „Vytvořit cvičení z tématu / vlastní věty“.</div>             
-</div>
           </div>
+        </div>
+
+        <div style="margin-bottom:10px;">
+          <label for="customSentence">Vlastní věta (volitelné)</label>
+          <input
+            id="customSentence"
+            type="text"
+            placeholder="Např.: Včera jsem šel do školy."
+            style="width:100%; padding:8px; box-sizing:border-box;"
+          />
+          <div class="tiny" style="margin-top:6px;">Napiš vlastní českou větu a klikni na „Vlastní věta“.</div>
         </div>
 
         <div class="row2" style="margin-bottom:10px;">
@@ -478,18 +466,18 @@
         <div class="hr"></div>
 
         <div class="btnRow">
-  <button id="createTopicBtn" class="primary" type="button">Vytvořit cvičení z tématu</button>
-  <button id="createCustomBtn" type="button">Vlastní věta</button>
-  <button id="nextBtnLeft" type="button">Nové cvičení</button>
-  <button id="resetProgBtn" class="danger" type="button" title="Vynuluje XP a progres v tomto prohlížeči">Reset XP</button>
-</div>
+          <button id="createTopicBtn" class="primary" type="button">Vytvořit cvičení z tématu</button>
+          <button id="createCustomBtn" type="button">Vlastní věta</button>
+          <button id="nextBtnLeft" type="button">Nové cvičení</button>
+          <button id="resetProgBtn" class="danger" type="button" title="Vynuluje XP a progres v tomto prohlížeči">Reset XP</button>
+        </div>
 
         <div class="note">
-          Demo obsahuje omezenou sadu vět a motivaci (XP). Plná verze s AI umí generovat neomezeně podle tématu, úrovně a chyb studenta.
+          Demo umí vytvořit cvičení z vybraného tématu i z vlastní české věty. Když pro téma není připravený preset, backend použije AI fallback.
         </div>
 
         <div class="footerNote">
-          Tip: Pokud ti demo dává smysl, AI verze bude teprve jízda (vysvětlení chyb, nové věty na míru, slovní zásoba podle potřeb).
+          Tip: Pro rychlý test zkus A1 → Present Simple, nebo napiš vlastní větu „Včera jsem šel do školy.“ a klikni na „Vlastní věta“.
         </div>
       </div>
 
@@ -510,7 +498,7 @@
 
         <div class="targetBox">
           <div class="targetTopRow">
-            <div id="targetHint" class="targetHint">Slož větu a klikni „Vyhodnotit“.</div>
+            <div id="targetHint" class="targetHint">Vyber téma nebo napiš vlastní větu a vytvoř cvičení.</div>
             <div class="btnRow">
               <button id="slowBtn" class="ghost" type="button" title="Pomalu (0,6)">Přehrát pomalu</button>
               <button id="toggleTrBtn" class="warn" type="button">Zobrazit překlad</button>
@@ -560,7 +548,7 @@
             </div>
 
             <div id="status" class="status">
-              <span>📌 Vyber úroveň a téma vlevo a klikni „Vytvořit cvičení“.</span>
+              <span>📌 Vyber úroveň a téma vlevo nebo napiš vlastní větu.</span>
               <small id="statusDetail">—</small>
             </div>
 
@@ -581,7 +569,7 @@
     <div class="modal">
       <h2>Gratulujeme! 🎉 Dokončil jsi demo (30 správných vět).</h2>
       <p>
-        Tohle byla offline ochutnávka. Plná verze s AI umí generovat neomezené množství cvičení a hlavně vysvětlí chyby tak,
+        Tohle byla ochutnávka. Plná verze s AI umí generovat neomezené množství cvičení a hlavně vysvětlí chyby tak,
         aby ses rychle zlepšoval(a).
       </p>
       <ul>
@@ -600,16 +588,17 @@
 <script>
 (() => {
   "use strict";
-const apiState = {
-  level: "A1",
-  topic: "present-simple",
-  sentenceCs: "",
-  usedIds: [],
-  currentExercise: null
-};
+
+  const apiState = {
+    usedIds: [],
+    currentExercise: null,
+    lastMode: "topic"
+  };
+
   const levelSel = document.getElementById("levelSel");
   const topicSel = document.getElementById("topicSel");
   const distrSel = document.getElementById("distrSel");
+  const customSentenceInput = document.getElementById("customSentence");
 
   const modeCommBtn = document.getElementById("modeComm");
   const modeSchoolBtn = document.getElementById("modeSchool");
@@ -618,11 +607,11 @@ const apiState = {
   const bgFlag = document.getElementById("bgFlag");
   const autoSpeakToggle = document.getElementById("autoSpeakToggle");
 
+  const createTopicBtn = document.getElementById("createTopicBtn");
+  const createCustomBtn = document.getElementById("createCustomBtn");
   const nextBtnLeft = document.getElementById("nextBtnLeft");
   const nextBtn = document.getElementById("nextBtn");
   const resetProgBtn = document.getElementById("resetProgBtn");
-  const createTopicBtn = document.getElementById("createTopicBtn");
-  const createCustomBtn = document.getElementById("createCustomBtn");
 
   const pillTopic = document.getElementById("pillTopic");
   const pillLevel = document.getElementById("pillLevel");
@@ -664,13 +653,12 @@ const apiState = {
   const DEMO_GOAL = 30;
   const XP_PER_LEVEL = 200;
   const SLOW_RATE = 0.6;
+  const API_URL = "https://fdc-gateway.vercel.app/api/exercise";
 
   let mode = "comm";
   let translationShown = false;
   let preferredVoice = null;
   let current = null;
-
-  const topicPointer = {};
 
   const PROG_KEY = "fdc_sentence_demo_progress_v1";
   let prog = {
@@ -681,78 +669,67 @@ const apiState = {
   };
 
   const DB = {
-A1: {
-
-  "present-simple": {
-    name: "Present Simple",
-    items: [
-      { en:"I go to school every day.", cz:"Chodím do školy každý den." },
-      { en:"They play football on Sunday.", cz:"V neděli hrají fotbal." },
-      { en:"He works in an office.", cz:"Pracuje v kanceláři." },
-      { en:"We watch movies on Friday evening.", cz:"V pátek večer se díváme na filmy." },
-      { en:"I like coffee in the morning.", cz:"Mám rád(a) kávu ráno." },
-      { en:"She speaks English at work.", cz:"Mluví anglicky v práci." }
-    ]
-  },
-
-  "present-continuous": {
-    name: "Present Continuous",
-    items: [
-      { en:"She is reading a book.", cz:"Ona právě čte knihu." },
-      { en:"We are cooking dinner tonight.", cz:"Dnes večer vaříme večeři." },
-      { en:"I am watching TV now.", cz:"Teď se dívám na televizi." },
-      { en:"They are playing in the park.", cz:"Hrají si v parku." },
-      { en:"He is working today.", cz:"Dnes pracuje." }
-    ]
-  },
-
-  "past-simple": {
-    name: "Past Simple",
-    items: [
-      { en:"I went to school yesterday.", cz:"Včera jsem šel do školy." }
-    ]
-  },
-
-  "future-will": {
-    name: "Future – will",
-    items: []
-  },
-
-  "there-is-are": {
-    name: "There is / There are",
-    items: [
-      { en:"There is a book on the table.", cz:"Na stole je kniha." },
-      { en:"There are two chairs in the room.", cz:"V místnosti jsou dvě židle." },
-      { en:"There is a dog in the garden.", cz:"Na zahradě je pes." }
-    ]
-  },
-
-  "articles": {
-    name: "Articles (a / an / the)",
-    items: []
-  },
-
-  "plural": {
-    name: "Plural nouns",
-    items: []
-  },
-
-  "prepositions-place": {
-    name: "Prepositions of place",
-    items: []
-  },
-
-  "can": {
-    name: "Modal – can / can't",
-    items: []
-  },
-
-  "have-got": {
-    name: "Have got / has got",
-    items: []
-  }
-
-},
+    A1: {
+      "present-simple": {
+        name: "Present Simple",
+        items: [
+          { en:"I go to school every day.", cz:"Chodím do školy každý den." },
+          { en:"They play football on Sunday.", cz:"V neděli hrají fotbal." },
+          { en:"He works in an office.", cz:"Pracuje v kanceláři." },
+          { en:"We watch movies on Friday evening.", cz:"V pátek večer se díváme na filmy." },
+          { en:"I like coffee in the morning.", cz:"Mám rád(a) kávu ráno." },
+          { en:"She speaks English at work.", cz:"Mluví anglicky v práci." }
+        ]
+      },
+      "present-continuous": {
+        name: "Present Continuous",
+        items: [
+          { en:"She is reading a book.", cz:"Ona právě čte knihu." },
+          { en:"We are cooking dinner tonight.", cz:"Dnes večer vaříme večeři." },
+          { en:"I am watching TV now.", cz:"Teď se dívám na televizi." },
+          { en:"They are playing in the park.", cz:"Hrají si v parku." },
+          { en:"He is working today.", cz:"Dnes pracuje." }
+        ]
+      },
+      "past-simple": {
+        name: "Past Simple",
+        items: [
+          { en:"I went to school yesterday.", cz:"Včera jsem šel do školy." }
+        ]
+      },
+      "future-will": {
+        name: "Future – will",
+        items: []
+      },
+      "there-is-are": {
+        name: "There is / There are",
+        items: [
+          { en:"There is a book on the table.", cz:"Na stole je kniha." },
+          { en:"There are two chairs in the room.", cz:"V místnosti jsou dvě židle." },
+          { en:"There is a dog in the garden.", cz:"Na zahradě je pes." }
+        ]
+      },
+      "articles": {
+        name: "Articles (a / an / the)",
+        items: []
+      },
+      "plural": {
+        name: "Plural nouns",
+        items: []
+      },
+      "prepositions-place": {
+        name: "Prepositions of place",
+        items: []
+      },
+      "can": {
+        name: "Modal – can / can't",
+        items: []
+      },
+      "have-got": {
+        name: "Have got / has got",
+        items: []
+      }
+    },
 
     A2: {
       "past-simple": {
@@ -869,14 +846,6 @@ A1: {
     }
   };
 
-  const DISTRACTOR_POOLS = {
-    generic: ["always","never","already","just","yesterday","tomorrow","quickly","slowly","maybe","really","then","but","because","also","often","sometimes","usually","still","again","perhaps"],
-    articles: ["a","an","the"],
-    preps: ["in","on","at","to","for","with","from","about","into","over","under","between"],
-    helpers: ["do","does","did","have","has","had","will","would","can","could","should","must","am","is","are","was","were"],
-    time: ["now","today","tonight","last","next","week","month","morning","evening","night","soon"]
-  };
-
   const QUICK_TIPS = [
     "Tip: Základní pořadí je SUBJECT – VERB – OBJECT (podmět – sloveso – předmět).",
     "Tip: 'always / often / never' většinou stojí před hlavním slovesem (I often go…).",
@@ -884,31 +853,34 @@ A1: {
     "Tip: Časové výrazy často dáváš na konec věty (…every day / …last week).",
     "Tip: Člen 'a/an/the' bývá těsně před podstatným jménem (a book / the car).",
     "Tip: Předložky (in/on/at) často rozhodují o významu – když si nejsi jistý, zkus jinou.",
-    "Tip: V otázkách a záporu v present simple často potřebuješ do/does (AI verze to vysvětlí do detailu)."
+    "Tip: V otázkách a záporu v present simple často potřebuješ do/does."
   ];
 
   const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
-  const clearZone = (z) => { while(z.firstChild) z.removeChild(z.firstChild); };
+
+  const clearZone = (z) => {
+    while (z.firstChild) z.removeChild(z.firstChild);
+  };
 
   const shuffle = (arr) => {
     const a = [...arr];
-    for(let i=a.length-1; i>0; i--){
-      const j = Math.floor(Math.random()*(i+1));
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
       [a[i], a[j]] = [a[j], a[i]];
     }
     return a;
   };
 
-  const normalizeSentence = (s) => (s||"")
+  const normalizeSentence = (s) => (s || "")
     .toLowerCase()
-    .replace(/\s+/g," ")
-    .replace(/\s+([.,!?;:])/g,"$1")
+    .replace(/\s+/g, " ")
+    .replace(/\s+([.,!?;:])/g, "$1")
     .trim();
 
   const sentenceStringFromWords = (words) => {
     let out = "";
-    for(const w of words){
-      if(!out) out = w;
+    for (const w of words) {
+      if (!out) out = w;
       else if (/^[\.\,\?\!\;\:]$/.test(w)) out += w;
       else out += " " + w;
     }
@@ -926,42 +898,49 @@ A1: {
 
   const tokenizeForMeaningCompare = (words) => {
     const ignore = new Set(["a","an","the","to","in","on","at","of","for","with","is","are","am","was","were","do","does","did","have","has","had","will","would","can","could","should","must","that"]);
-    return words.map(w=>w.toLowerCase())
-      .filter(w=>!/^[.,!?;:]$/.test(w))
-      .filter(w=>!ignore.has(w));
+    return words.map(w => w.toLowerCase())
+      .filter(w => !/^[.,!?;:]$/.test(w))
+      .filter(w => !ignore.has(w));
   };
 
   const getWordsInZone = (zone) => [...zone.querySelectorAll(".token")].map(t => t.dataset.value);
 
-  const setStatus = (kind, main, detail="") => {
-    statusEl.classList.remove("good","warn","bad");
-    if(kind) statusEl.classList.add(kind);
+  const setStatus = (kind, main, detail = "") => {
+    statusEl.classList.remove("good", "warn", "bad");
+    if (kind) statusEl.classList.add(kind);
     statusEl.querySelector("span").textContent = main;
     statusDetail.textContent = detail || "—";
   };
 
   const clearMarks = () => {
     [...bankEl.querySelectorAll(".token"), ...builderEl.querySelectorAll(".token")]
-      .forEach(t => t.classList.remove("correct","wrong"));
+      .forEach(t => t.classList.remove("correct", "wrong"));
   };
 
   const updateRemainingChip = () => {
-    if(!current){ chipLeft.textContent = "Zbývá vložit: —"; chipCorrectCount.textContent = "Správná slova vložena: —"; return; }
-    const expected = current.words.map(w=>w.toLowerCase());
-    const built = getWordsInZone(builderEl).map(w=>w.toLowerCase());
+    if (!current) {
+      chipLeft.textContent = "Zbývá vložit: —";
+      chipCorrectCount.textContent = "Správná slova vložena: —";
+      return;
+    }
+
+    const expected = current.words.map(w => w.toLowerCase());
+    const built = getWordsInZone(builderEl).map(w => w.toLowerCase());
     const bag = new Map();
-    for(const w of expected) bag.set(w, (bag.get(w)||0)+1);
+
+    for (const w of expected) bag.set(w, (bag.get(w) || 0) + 1);
 
     let matchedNow = 0;
-    for(const w of built){
-      const n = bag.get(w)||0;
-      if(n>0){
+    for (const w of built) {
+      const n = bag.get(w) || 0;
+      if (n > 0) {
         matchedNow++;
-        bag.set(w, n-1);
+        bag.set(w, n - 1);
       }
     }
+
     let remaining = 0;
-    for(const n of bag.values()) remaining += n;
+    for (const n of bag.values()) remaining += n;
 
     chipLeft.textContent = `Zbývá vložit: ${remaining}`;
     chipCorrectCount.textContent = `Správná slova vložena: ${matchedNow}/${expected.length}`;
@@ -971,7 +950,8 @@ A1: {
     const words = getWordsInZone(builderEl);
     const s = sentenceStringFromWords(words).trim();
     builtSentenceEl.innerHTML = "";
-    if(!s){
+
+    if (!s) {
       const ph = document.createElement("span");
       ph.className = "placeholder";
       ph.textContent = "— (zatím prázdné)";
@@ -979,34 +959,35 @@ A1: {
     } else {
       builtSentenceEl.textContent = s;
     }
+
     updateRemainingChip();
   };
 
   const loadProg = () => {
-    try{
+    try {
       const raw = localStorage.getItem(PROG_KEY);
-      if(raw){
+      if (raw) {
         const obj = JSON.parse(raw);
-        if(obj && typeof obj === "object"){
+        if (obj && typeof obj === "object") {
           prog = {
-            xp: Number(obj.xp||0),
-            streak: Number(obj.streak||0),
-            demoDone: Number(obj.demoDone||0),
-            level: Number(obj.level||1)
+            xp: Number(obj.xp || 0),
+            streak: Number(obj.streak || 0),
+            demoDone: Number(obj.demoDone || 0),
+            level: Number(obj.level || 1)
           };
         }
       }
-    }catch(_){}
+    } catch (_) {}
     recomputeLevelFromXP();
     renderProg();
   };
 
   const saveProg = () => {
-    try{ localStorage.setItem(PROG_KEY, JSON.stringify(prog)); }catch(_){}
+    try { localStorage.setItem(PROG_KEY, JSON.stringify(prog)); } catch (_) {}
   };
 
   const recomputeLevelFromXP = () => {
-    const xp = Math.max(0, Number(prog.xp||0));
+    const xp = Math.max(0, Number(prog.xp || 0));
     const lvl = Math.floor(xp / XP_PER_LEVEL) + 1;
     prog.level = Math.max(1, lvl);
   };
@@ -1014,12 +995,10 @@ A1: {
   const renderProg = () => {
     xpVal.textContent = String(prog.xp);
     streakVal.textContent = String(prog.streak);
-    demoDoneVal.textContent = String(clamp(prog.demoDone, 0, 9999));
+    demoDoneVal.textContent = String(Math.min(prog.demoDone, DEMO_GOAL));
     lvlVal.textContent = String(prog.level);
-
     const inLevel = prog.xp % XP_PER_LEVEL;
     lvlProgText.textContent = `${inLevel}/${XP_PER_LEVEL}`;
-    demoDoneVal.textContent = String(Math.min(prog.demoDone, DEMO_GOAL));
   };
 
   const addXP = (amount) => {
@@ -1039,17 +1018,15 @@ A1: {
     prog.demoDone = Math.max(0, prog.demoDone + 1);
     saveProg();
     renderProg();
-    if(prog.demoDone === DEMO_GOAL){
-      showModal();
-    }
+    if (prog.demoDone === DEMO_GOAL) showModal();
   };
 
   const resetProg = () => {
-    if(!confirm("Opravdu chceš vynulovat XP a progres v tomto prohlížeči?")) return;
-    prog = { xp:0, streak:0, demoDone:0, level:1 };
+    if (!confirm("Opravdu chceš vynulovat XP a progres v tomto prohlížeči?")) return;
+    prog = { xp: 0, streak: 0, demoDone: 0, level: 1 };
     saveProg();
     renderProg();
-    setStatus("", "Resetováno. Vyber úroveň/téma a klikni „Vytvořit cvičení“.", "—");
+    setStatus("", "Resetováno. Vyber úroveň/téma nebo napiš vlastní větu.", "—");
   };
 
   const showModal = () => modalBack.classList.add("show");
@@ -1059,18 +1036,22 @@ A1: {
     const level = levelSel.value;
     const topics = DB[level] || {};
     const keys = Object.keys(topics);
-    alert("Počet témat pro " + level + ": " + keys.length);
-    console.log("DEBUG topics", level, keys);
     const prev = topicSel.value;
 
     topicSel.innerHTML = "";
-    for(const k of keys){
+
+    for (const k of keys) {
       const opt = document.createElement("option");
       opt.value = k;
       opt.textContent = topics[k].name;
       topicSel.appendChild(opt);
     }
-    if(prev && keys.includes(prev)) topicSel.value = prev;
+
+    if (prev && keys.includes(prev)) {
+      topicSel.value = prev;
+    } else if (keys.length > 0) {
+      topicSel.value = keys[0];
+    }
   };
 
   const setMode = (m) => {
@@ -1082,43 +1063,47 @@ A1: {
     modeSchoolBtn.setAttribute("aria-selected", String(!isComm));
     pillMode.textContent = isComm ? "Domluvit se" : "Do školy";
     chipMode.textContent = "Režim: " + (isComm ? "Domluvit se" : "Do školy");
-    if(current){
-      setStatus("", "📌 Slož větu a klikni „Vyhodnotit“.", isComm
-        ? "Cíl: domluvit se — toleruje drobné chyby."
-        : "Cíl: do školy — přísnější hodnocení."
+
+    if (current) {
+      setStatus(
+        "",
+        "📌 Slož větu a klikni „Vyhodnotit“.",
+        isComm
+          ? "Cíl: domluvit se — toleruje drobné chyby."
+          : "Cíl: do školy — přísnější hodnocení."
       );
     }
   };
 
   const pickPreferredVoice = () => {
     const synth = window.speechSynthesis;
-    if(!synth) return null;
+    if (!synth) return null;
     const voices = synth.getVoices() || [];
-    const vGB = voices.find(v => (v.lang||"").toLowerCase().startsWith("en-gb"));
-    const vUS = voices.find(v => (v.lang||"").toLowerCase().startsWith("en-us"));
-    const vEN = voices.find(v => (v.lang||"").toLowerCase().startsWith("en"));
+    const vGB = voices.find(v => (v.lang || "").toLowerCase().startsWith("en-gb"));
+    const vUS = voices.find(v => (v.lang || "").toLowerCase().startsWith("en-us"));
+    const vEN = voices.find(v => (v.lang || "").toLowerCase().startsWith("en"));
     return vGB || vUS || vEN || null;
   };
 
-  const speak = (text, rate=1.0) => {
+  const speak = (text, rate = 1.0) => {
     const synth = window.speechSynthesis;
-    if(!synth || !window.SpeechSynthesisUtterance){
-      setStatus("warn","⚠️ Prohlížeč nepodporuje čtení nahlas (Web Speech API).", "Zkus Chrome/Edge.");
+    if (!synth || !window.SpeechSynthesisUtterance) {
+      setStatus("warn", "⚠️ Prohlížeč nepodporuje čtení nahlas (Web Speech API).", "Zkus Chrome nebo Edge.");
       return;
     }
     synth.cancel();
     const u = new SpeechSynthesisUtterance(text);
     u.rate = rate;
-    if(!preferredVoice) preferredVoice = pickPreferredVoice();
-    if(preferredVoice) u.voice = preferredVoice;
+    if (!preferredVoice) preferredVoice = pickPreferredVoice();
+    if (preferredVoice) u.voice = preferredVoice;
     synth.speak(u);
   };
 
-  if("speechSynthesis" in window){
+  if ("speechSynthesis" in window) {
     window.speechSynthesis.onvoiceschanged = () => preferredVoice = pickPreferredVoice();
   }
   preferredVoice = pickPreferredVoice();
-  chipSlow.textContent = `Pomalu: ${String(SLOW_RATE).replace(".",",")}×`;
+  chipSlow.textContent = `Pomalu: ${String(SLOW_RATE).replace(".", ",")}×`;
 
   const makeToken = (text) => {
     const el = document.createElement("div");
@@ -1148,18 +1133,19 @@ A1: {
 
     el.addEventListener("dragstart", (e) => {
       el.classList.add("dragging");
-      e.dataTransfer.setData("text/plain","token");
+      e.dataTransfer.setData("text/plain", "token");
       e.dataTransfer.effectAllowed = "move";
     });
+
     el.addEventListener("dragend", () => {
       el.classList.remove("dragging");
       updateBuiltSentence();
     });
 
     el.addEventListener("click", (e) => {
-      if(e.target === leftBtn || e.target === rightBtn) return;
+      if (e.target === leftBtn || e.target === rightBtn) return;
       const parent = el.parentElement;
-      if(parent === bankEl) builderEl.appendChild(el);
+      if (parent === bankEl) builderEl.appendChild(el);
       else bankEl.appendChild(el);
       clearMarks();
       setStatus("", "📌 Slož větu a klikni „Vyhodnotit“.", "Tip: slova lze přesouvat i klepnutím.");
@@ -1168,18 +1154,18 @@ A1: {
 
     leftBtn.addEventListener("click", (e) => {
       e.stopPropagation();
-      if(el.parentElement !== builderEl) return;
+      if (el.parentElement !== builderEl) return;
       const prev = el.previousElementSibling;
-      if(prev) builderEl.insertBefore(el, prev);
+      if (prev) builderEl.insertBefore(el, prev);
       clearMarks();
       updateBuiltSentence();
     });
 
     rightBtn.addEventListener("click", (e) => {
       e.stopPropagation();
-      if(el.parentElement !== builderEl) return;
+      if (el.parentElement !== builderEl) return;
       const next = el.nextElementSibling;
-      if(next) builderEl.insertBefore(next, el);
+      if (next) builderEl.insertBefore(next, el);
       clearMarks();
       updateBuiltSentence();
     });
@@ -1189,14 +1175,15 @@ A1: {
 
   const getClosestToken = (container, x, y) => {
     const tokens = [...container.querySelectorAll(".token:not(.dragging)")];
-    if(tokens.length === 0) return null;
+    if (tokens.length === 0) return null;
+
     let best = { dist: Infinity, el: null };
-    for(const t of tokens){
+    for (const t of tokens) {
       const r = t.getBoundingClientRect();
-      const cx = r.left + r.width/2;
-      const cy = r.top + r.height/2;
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
       const d = Math.hypot(x - cx, y - cy);
-      if(d < best.dist){ best = { dist:d, el:t }; }
+      if (d < best.dist) best = { dist: d, el: t };
     }
     return best.el;
   };
@@ -1206,12 +1193,14 @@ A1: {
       e.preventDefault();
       zone.classList.add("isOver");
       const dragging = document.querySelector(".token.dragging");
-      if(!dragging) return;
+      if (!dragging) return;
       const afterEl = getClosestToken(zone, e.clientX, e.clientY);
-      if(afterEl == null) zone.appendChild(dragging);
+      if (afterEl == null) zone.appendChild(dragging);
       else zone.insertBefore(dragging, afterEl);
     });
+
     zone.addEventListener("dragleave", () => zone.classList.remove("isOver"));
+
     zone.addEventListener("drop", (e) => {
       e.preventDefault();
       zone.classList.remove("isOver");
@@ -1224,66 +1213,34 @@ A1: {
   enableDropZone(bankEl);
   enableDropZone(builderEl);
 
-  const getPoolFor = (topicKey, level) => {
-    const pools = [];
-    pools.push(...DISTRACTOR_POOLS.generic);
+  const normalizeApiExercise = (data, requestMode) => {
+    const currentLevel = levelSel.value;
+    const currentTopicKey = requestMode === "custom" ? "custom" : topicSel.value;
+    const currentTopicName = requestMode === "custom"
+      ? "Vlastní věta"
+      : (DB[currentLevel]?.[currentTopicKey]?.name || topicSel.options[topicSel.selectedIndex]?.textContent || currentTopicKey);
 
-    if(topicKey.includes("present")) pools.push("yesterday","last","ago");
-    if(topicKey.includes("past")) pools.push("now","today","tomorrow");
-    if(topicKey.includes("perfect")) pools.push("yesterday","last","ago","did","was");
-    if(topicKey.includes("conditionals")) pools.push("maybe","then","because","unless","if");
-    if(topicKey.includes("passive")) pools.push("by","from","to","with");
-    if(topicKey.includes("reported")) pools.push("say","tell","told","said","that");
-    if(topicKey.includes("there")) pools.push("is","are","a","the","in","on","at");
+    const correctWords = Array.isArray(data.correctWords) && data.correctWords.length
+      ? data.correctWords
+      : wordsFromEN(data.targetSentence || "");
 
-    if(level === "A1" || level === "A2"){
-      pools.push(...DISTRACTOR_POOLS.articles, ...DISTRACTOR_POOLS.preps);
-    } else {
-      pools.push(...DISTRACTOR_POOLS.articles, ...DISTRACTOR_POOLS.preps, ...DISTRACTOR_POOLS.helpers);
-    }
-    pools.push(...DISTRACTOR_POOLS.time);
+    const distractors = Array.isArray(data.extraWords) ? data.extraWords : [];
+    const targetEN = data.targetSentence || sentenceStringFromWords(correctWords);
+    const translationCZ = data.translationCs || "";
+    const sourceType = data.sourceType || (requestMode === "custom" ? "custom" : "preset");
 
-    return [...new Set(pools)];
-  };
-
-  const pickDistractorsExact = (count, forbiddenSet, pool) => {
-    const candidates = pool.filter(w => !forbiddenSet.has(w.toLowerCase()));
-    const picked = [];
-    for(const w of shuffle(candidates)){
-      if(picked.length >= count) break;
-      if(!picked.map(x=>x.toLowerCase()).includes(w.toLowerCase())) picked.push(w);
-    }
-    const fallback = ["maybe","really","sometimes","usually","already","never","then","also","because","quickly","slowly"];
-    let i = 0;
-    while(picked.length < count){
-      const w = fallback[i++ % fallback.length];
-      if(!forbiddenSet.has(w.toLowerCase()) && !picked.includes(w)) picked.push(w);
-    }
-    return picked.slice(0, count);
-  };
-
-  const getNextItem = (level, topicKey) => {
-    const topic = DB[level]?.[topicKey];
-    if(!topic || !topic.items || topic.items.length === 0) return null;
-    const items = topic.items;
-
-    const key = `${level}|${topicKey}`;
-    if(!(key in topicPointer)){
-      topicPointer[key] = Math.floor(Math.random() * items.length);
-    }
-    const idx0 = topicPointer[key] % items.length;
-    topicPointer[key]++;
-
-    return { item: items[idx0], idx: idx0+1, total: items.length, topicName: topic.name };
-  };
-
-  const buildExerciseFromItem = (level, topicKey, topicName, en, cz, idx, total) => {
-    const words = wordsFromEN(en);
-    const forbidden = new Set(words.map(w => w.toLowerCase()));
-    const distractCount = Number(distrSel.value || 2);
-    const pool = getPoolFor(topicKey, level);
-    const distractors = pickDistractorsExact(distractCount, forbidden, pool);
-    return { level, topicKey, topicName, targetEN: en, translationCZ: cz, words, distractors, idx, total };
+    return {
+      level: currentLevel,
+      topicKey: currentTopicKey,
+      topicName: currentTopicName,
+      targetEN,
+      translationCZ,
+      words: correctWords,
+      distractors,
+      idx: 1,
+      total: 1,
+      sourceType
+    };
   };
 
   const loadExercise = (ex) => {
@@ -1309,32 +1266,36 @@ A1: {
     updateBuiltSentence();
 
     targetHint.textContent = "Slož větu a klikni „Vyhodnotit“.";
-    setStatus("", "✅ Cvičení připraveno. Teď skládej.", `Věta ${ex.idx}/${ex.total} • Rušiče: ${ex.distractors.length}/${Number(distrSel.value || 2)} • Úroveň: ${ex.level}`);
+    setStatus(
+      "",
+      "✅ Cvičení připraveno. Teď skládej.",
+      `Zdroj: ${ex.sourceType} • Úroveň: ${ex.level} • Rušiče: ${ex.distractors.length}/${Number(distrSel.value || 2)}`
+    );
   };
 
   const randTip = () => QUICK_TIPS[Math.floor(Math.random() * QUICK_TIPS.length)];
 
   const buildFeedbackForSchool = (builtWords) => {
-    const built = builtWords.map(w=>w.toLowerCase());
-    const target = current.words.map(w=>w.toLowerCase());
+    const built = builtWords.map(w => w.toLowerCase());
+    const target = current.words.map(w => w.toLowerCase());
 
     const missing = [];
     const bag = new Map();
-    for(const w of target) bag.set(w, (bag.get(w)||0)+1);
-    for(const w of built){
-      const n = bag.get(w)||0;
-      if(n>0) bag.set(w, n-1);
+    for (const w of target) bag.set(w, (bag.get(w) || 0) + 1);
+    for (const w of built) {
+      const n = bag.get(w) || 0;
+      if (n > 0) bag.set(w, n - 1);
     }
-    for(const [w,n] of bag.entries()){
-      if(n>0 && !/^[.,!?;:]$/.test(w)) missing.push(w);
+    for (const [w, n] of bag.entries()) {
+      if (n > 0 && !/^[.,!?;:]$/.test(w)) missing.push(w);
     }
 
     const functionWords = ["a","an","the","to","in","on","at","for","with","have","has","had","am","is","are","was","were","will","would","do","does","did"];
-    const missingFunc = missing.filter(w=>functionWords.includes(w)).slice(0,3);
-    const missingContent = missing.filter(w=>!functionWords.includes(w)).slice(0,3);
+    const missingFunc = missing.filter(w => functionWords.includes(w)).slice(0, 3);
+    const missingContent = missing.filter(w => !functionWords.includes(w)).slice(0, 3);
 
-    if(missingContent.length) return `Chybí ti klíčové slovo(a): ${missingContent.join(", ")}.`;
-    if(missingFunc.length) return `Pozor na gramatiku: chybí ${missingFunc.join(", ")}.`;
+    if (missingContent.length) return `Chybí ti klíčové slovo(a): ${missingContent.join(", ")}.`;
+    if (missingFunc.length) return `Pozor na gramatiku: chybí ${missingFunc.join(", ")}.`;
     return "Zkus doladit slovosled a drobnou gramatiku.";
   };
 
@@ -1342,24 +1303,23 @@ A1: {
     const builtMeaning = tokenizeForMeaningCompare(builtWords);
     const targetMeaning = tokenizeForMeaningCompare(current.words);
     const targetSet = new Set(targetMeaning);
-    const wrong = builtMeaning.filter(w=>!targetSet.has(w));
-    if(wrong.length) return `Možná máš navíc/špatně: ${wrong.slice(0,3).join(", ")}.`;
-    if(builtMeaning.length < Math.max(2, Math.floor(targetMeaning.length*0.6))) return "Chybí ti část významu (zkus doplnit hlavní slova).";
+    const wrong = builtMeaning.filter(w => !targetSet.has(w));
+    if (wrong.length) return `Možná máš navíc/špatně: ${wrong.slice(0, 3).join(", ")}.`;
+    if (builtMeaning.length < Math.max(2, Math.floor(targetMeaning.length * 0.6))) return "Chybí ti část významu (zkus doplnit hlavní slova).";
     return "Je to skoro ono – doladíš slovosled a bude to.";
   };
 
   const awardForGreen = () => {
     let xp = 10;
     const nextStreak = prog.streak + 1;
-    if(nextStreak >= 5) xp += 10;
-    else if(nextStreak >= 3) xp += 5;
-    if(mode === "school") xp += 2;
+    if (nextStreak >= 5) xp += 10;
+    else if (nextStreak >= 3) xp += 5;
+    if (mode === "school") xp += 2;
 
     setStreak(nextStreak);
     addXP(xp);
 
-    if(prog.demoDone < DEMO_GOAL) incDemoDone();
-
+    if (prog.demoDone < DEMO_GOAL) incDemoDone();
     return xp;
   };
 
@@ -1368,17 +1328,18 @@ A1: {
   };
 
   const evaluate = () => {
-    if(!current){
-      setStatus("warn","🟨 Nejdřív vytvoř cvičení.", "Vyber úroveň, téma a klikni „Vytvořit cvičení“.");
+    if (!current) {
+      setStatus("warn", "🟨 Nejdřív vytvoř cvičení.", "Vyber úroveň a téma nebo napiš vlastní větu.");
       return;
     }
+
     clearMarks();
 
     const builtWords = getWordsInZone(builderEl);
     const builtStr = normalizeSentence(sentenceStringFromWords(builtWords));
     const targetStr = normalizeSentence(current.targetEN);
 
-    if(builtStr === targetStr){
+    if (builtStr === targetStr) {
       [...builderEl.querySelectorAll(".token")].forEach(t => t.classList.add("correct"));
       builderEl.classList.remove("correctFlash");
       void builderEl.offsetWidth;
@@ -1388,9 +1349,7 @@ A1: {
       targetHint.textContent = "Hotovo. Super! Teď si větu přehraj a zopakuj nahlas.";
       setStatus("good", `🟩 Gramaticky správně. Super! (+${earned} XP)`, `🔥 Série: ${prog.streak} • ⭐ XP: ${prog.xp} • 🧪 Demo: ${Math.min(prog.demoDone, DEMO_GOAL)}/${DEMO_GOAL}`);
 
-      if(autoSpeakToggle.checked){
-        speak(builtStr, SLOW_RATE);
-      }
+      if (autoSpeakToggle.checked) speak(builtStr, SLOW_RATE);
       return;
     }
 
@@ -1398,12 +1357,15 @@ A1: {
     const builtMeaning = tokenizeForMeaningCompare(builtWords);
 
     const bag = new Map();
-    for(const w of builtMeaning) bag.set(w, (bag.get(w)||0)+1);
+    for (const w of builtMeaning) bag.set(w, (bag.get(w) || 0) + 1);
 
     let matched = 0;
-    for(const w of expectedMeaning){
-      const n = bag.get(w)||0;
-      if(n>0){ matched++; bag.set(w, n-1); }
+    for (const w of expectedMeaning) {
+      const n = bag.get(w) || 0;
+      if (n > 0) {
+        matched++;
+        bag.set(w, n - 1);
+      }
     }
     const coverage = expectedMeaning.length ? (matched / expectedMeaning.length) : 0;
 
@@ -1418,57 +1380,58 @@ A1: {
 
     punishForWrong();
 
-    if(mode === "comm"){
-      if(coverage >= 0.65 && wrongMeaningCount <= 2){
+    if (mode === "comm") {
+      if (coverage >= 0.65 && wrongMeaningCount <= 2) {
         targetHint.textContent = "Je to srozumitelné, ale chce to doladit (slovosled/gramatika).";
-        setStatus("warn","🟨 Srozumitelné, ale gramaticky nic moc.", buildFeedbackForComm(builtWords) + " " + randTip());
+        setStatus("warn", "🟨 Srozumitelné, ale gramaticky nic moc.", buildFeedbackForComm(builtWords) + " " + randTip());
         return;
       }
       targetHint.textContent = "Zkus to ještě jednou. Kdyžtak použij „Srovnat (nápověda)“.";
-      setStatus("bad","🟥 Tohle je špatně.", buildFeedbackForComm(builtWords) + " " + randTip());
-      return;
-    } else {
-      if(coverage >= 0.80 && wrongMeaningCount <= 1){
-        targetHint.textContent = "Skoro! Chybí detail (slovosled/gramatika).";
-        setStatus("warn","🟨 Skoro správně, ale do školy ještě doladit.", buildFeedbackForSchool(builtWords) + " " + randTip());
-        return;
-      }
-      targetHint.textContent = "Zkus to znovu. Kdyžtak použij „Srovnat (nápověda)“.";
-      setStatus("bad","🟥 Tohle je špatně.", buildFeedbackForSchool(builtWords) + " " + randTip());
+      setStatus("bad", "🟥 Tohle je špatně.", buildFeedbackForComm(builtWords) + " " + randTip());
       return;
     }
+
+    if (coverage >= 0.80 && wrongMeaningCount <= 1) {
+      targetHint.textContent = "Skoro! Chybí detail (slovosled/gramatika).";
+      setStatus("warn", "🟨 Skoro správně, ale do školy ještě doladit.", buildFeedbackForSchool(builtWords) + " " + randTip());
+      return;
+    }
+
+    targetHint.textContent = "Zkus to znovu. Kdyžtak použij „Srovnat (nápověda)“.";
+    setStatus("bad", "🟥 Tohle je špatně.", buildFeedbackForSchool(builtWords) + " " + randTip());
   };
 
   const hintAlign = () => {
-    if(!current){
-      setStatus("warn","🟨 Nejdřív vytvoř cvičení.", "Pak teprve má smysl nápověda.");
+    if (!current) {
+      setStatus("warn", "🟨 Nejdřív vytvoř cvičení.", "Pak teprve má smysl nápověda.");
       return;
     }
+
     clearMarks();
 
     const allTokens = [...bankEl.querySelectorAll(".token"), ...builderEl.querySelectorAll(".token")];
     const byWord = new Map();
-    for(const t of allTokens){
+    for (const t of allTokens) {
       const w = t.dataset.value;
-      if(!byWord.has(w)) byWord.set(w, []);
+      if (!byWord.has(w)) byWord.set(w, []);
       byWord.get(w).push(t);
     }
 
     clearZone(builderEl);
-    for(const w of current.words){
+    for (const w of current.words) {
       const list = byWord.get(w) || [];
       builderEl.appendChild(list.shift() || makeToken(w));
     }
 
     clearZone(bankEl);
     const remainingTokens = [];
-    for(const list of byWord.values()){
-      for(const t of list) remainingTokens.push(t);
+    for (const list of byWord.values()) {
+      for (const t of list) remainingTokens.push(t);
     }
     shuffle(remainingTokens).forEach(t => bankEl.appendChild(t));
 
-    targetHint.textContent = "Nápověda použita. Teď klikni „Vyhodnotit“ (a zkus si větu přehrát).";
-    setStatus("warn","🟨 Srovnáno (nápověda).", "Rušiče zůstaly v bance.");
+    targetHint.textContent = "Nápověda použita. Teď klikni „Vyhodnotit“.";
+    setStatus("warn", "🟨 Srovnáno (nápověda).", "Rušiče zůstaly v bance.");
     clearMarks();
     updateBuiltSentence();
   };
@@ -1489,8 +1452,8 @@ A1: {
   };
 
   const toggleTranslation = () => {
-    if(!current){
-      setStatus("warn","🟨 Nejdřív vytvoř cvičení.", "Pak můžeš zobrazit překlad.");
+    if (!current) {
+      setStatus("warn", "🟨 Nejdřív vytvoř cvičení.", "Pak můžeš zobrazit překlad.");
       return;
     }
     translationShown = !translationShown;
@@ -1500,42 +1463,114 @@ A1: {
 
   const getBuiltTextOrWarn = () => {
     const s = sentenceStringFromWords(getWordsInZone(builderEl)).trim();
-    if(!s){
-      setStatus("warn","🟨 Nejdřív slož větu.", "Pak ji můžeš přehrát.");
+    if (!s) {
+      setStatus("warn", "🟨 Nejdřív slož větu.", "Pak ji můžeš přehrát.");
       return null;
     }
     return s;
   };
 
   const speakNormal = () => {
-    const s = getBuiltTextOrWarn(); if(!s) return;
+    const s = getBuiltTextOrWarn();
+    if (!s) return;
     speak(s, 1.0);
   };
+
   const speakSlow = () => {
-    const s = getBuiltTextOrWarn(); if(!s) return;
+    const s = getBuiltTextOrWarn();
+    if (!s) return;
     speak(s, SLOW_RATE);
   };
 
-  const createFromDB = async () => {
-  const ex = await fetchExerciseFromApi();
+  async function fetchExerciseFromApi(requestMode = "topic") {
+    let payload;
 
-  if (!ex) {
-    setStatus("bad", "🟥 Cvičení se nepodařilo načíst.", "Zkus to znovu.");
-    return;
+    if (requestMode === "custom") {
+      const sentence = customSentenceInput.value.trim();
+
+      if (!sentence) {
+        setStatus("bad", "🟥 Napiš nejdřív českou větu.", "");
+        return null;
+      }
+
+      payload = {
+        level: levelSel.value,
+        topic: "custom",
+        sourceType: "custom",
+        usedIds: [],
+        sentenceCs: sentence
+      };
+    } else {
+      payload = {
+        level: levelSel.value,
+        topic: topicSel.value,
+        sourceType: "preset",
+        usedIds: apiState.usedIds
+      };
+    }
+
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        const errText = await res.text();
+        console.error("API error:", errText);
+        setStatus("bad", "🟥 Cvičení se nepodařilo načíst.", "Zkus to znovu.");
+        return null;
+      }
+
+      const data = await res.json();
+      apiState.currentExercise = data;
+
+      if (requestMode === "topic" && data.id && !apiState.usedIds.includes(data.id)) {
+        apiState.usedIds.push(data.id);
+      }
+
+      return normalizeApiExercise(data, requestMode);
+    } catch (err) {
+      console.error("Fetch failed:", err);
+      setStatus("bad", "🟥 Nepodařilo se spojit se serverem.", "Zkus to znovu.");
+      return null;
+    }
   }
 
-  loadExercise(ex);
-};
+  async function createTopicExercise() {
+    apiState.lastMode = "topic";
+    const ex = await fetchExerciseFromApi("topic");
+    if (!ex) return;
+    loadExercise(ex);
+  }
 
-  const nextExercise = () => createFromDB();
+  async function createCustomExercise() {
+    apiState.lastMode = "custom";
+    const ex = await fetchExerciseFromApi("custom");
+    if (!ex) return;
+    loadExercise(ex);
+  }
+
+  async function nextExercise() {
+    if (apiState.lastMode === "custom") {
+      await createCustomExercise();
+    } else {
+      await createTopicExercise();
+    }
+  }
 
   levelSel.addEventListener("change", () => {
+    apiState.usedIds = [];
     refreshTopics();
-    setStatus("", "📌 Vyber téma a klikni „Vytvořit cvičení“.", "Změnila se úroveň.");
+    setStatus("", "📌 Vyber téma a klikni „Vytvořit cvičení z tématu“.", "Změnila se úroveň.");
   });
 
   topicSel.addEventListener("change", () => {
-    setStatus("", "📌 Klikni „Vytvořit cvičení“.", "Změnilo se téma.");
+    apiState.usedIds = [];
+    setStatus("", "📌 Klikni „Vytvořit cvičení z tématu“.", "Změnilo se téma.");
   });
 
   modeCommBtn.addEventListener("click", () => setMode("comm"));
@@ -1544,42 +1579,14 @@ A1: {
   flagToggle.addEventListener("change", () => {
     bgFlag.style.display = flagToggle.checked ? "block" : "none";
   });
-createTopicBtn.addEventListener("click", async () => {
 
-  apiState.sentenceCs = "";
-
-  const ex = await fetchExerciseFromApi();
-
-  if (!ex) return;
-
-  loadExercise(ex);
-
-});
-
-createCustomBtn.addEventListener("click", async () => {
-
-  const sentence = document.getElementById("customSentence").value.trim();
-
-  if (!sentence) {
-    setStatus("bad","🟥 Napiš nejdřív českou větu.","");
-    return;
-  }
-
-  apiState.sentenceCs = sentence;
-
-  const ex = await fetchExerciseFromApi();
-
-  if (!ex) return;
-
-  loadExercise(ex);
-
-});
+  createTopicBtn.addEventListener("click", createTopicExercise);
+  createCustomBtn.addEventListener("click", createCustomExercise);
   nextBtnLeft.addEventListener("click", nextExercise);
   nextBtn.addEventListener("click", nextExercise);
 
   shuffleBtn.addEventListener("click", shuffleBank);
   clearBtn.addEventListener("click", clearBuilder);
-
   toggleTrBtn.addEventListener("click", toggleTranslation);
 
   evalBtn.addEventListener("click", evaluate);
@@ -1589,100 +1596,26 @@ createCustomBtn.addEventListener("click", async () => {
   slowBtn.addEventListener("click", speakSlow);
 
   distrSel.addEventListener("change", () => {
-    if(current){
-      setStatus("", "⚙️ Počet rušičů se použije v dalším cvičení.", "Klikni „Nové cvičení“ nebo „Vytvořit cvičení“.");
+    if (current) {
+      setStatus("", "⚙️ Počet rušičů se použije v dalším cvičení.", "Klikni „Nové cvičení“.");
     }
   });
 
   resetProgBtn.addEventListener("click", resetProg);
 
   closeModalBtn.addEventListener("click", hideModal);
-  modalBack.addEventListener("click", (e) => { if(e.target === modalBack) hideModal(); });
-  document.addEventListener("keydown", (e) => { if(e.key === "Escape") hideModal(); });
+  modalBack.addEventListener("click", (e) => { if (e.target === modalBack) hideModal(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") hideModal(); });
 
   const init = () => {
     loadProg();
     refreshTopics();
     setMode("comm");
     bgFlag.style.display = flagToggle.checked ? "block" : "none";
-    setStatus("", "📌 Vyber úroveň a téma vlevo a klikni „Vytvořit cvičení“.", "Cílová anglická věta se v demu neukazuje předem.");
+    setStatus("", "📌 Vyber úroveň a téma vlevo, nebo napiš vlastní větu.", "Cílová anglická věta se v demu neukazuje předem.");
     updateBuiltSentence();
   };
 
-const sentence = document.getElementById("customSentence").value.trim();
-
-const payload = {
-  level: levelSel.value,
-  topic: topicSel.value,
-  sourceType: sentence ? "custom" : "preset",
-  usedIds: apiState.usedIds
-};
-
-if (sentence) {
-  payload.sentenceCs = sentence;
-  }
-
-const res = await fetch("https://fdc-gateway.vercel.app/api/exercise", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(payload)
-  });
-
- if (!res.ok) {
-  const errText = await res.text();
-  console.error("API error:", errText);
-  return null;
-  }
-
-  const data = await res.json();
-
-  apiState.currentExercise = data;
-
-  if (data.id && !apiState.usedIds.includes(data.id)) {
-    apiState.usedIds.push(data.id);
-  }
-
-  return data;
-}
-  async function fetchExerciseFromApi() {
-
-  console.log("DEBUG level/topic:", levelSel.value, topicSel.value);
-    
-  const payload = {
-  level: "A1",
-  topic: "present-simple",
-  sourceType: "preset",
-  usedIds: []
-};
-
-  const res = await fetch("/api/exercise", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(payload)
-  });
-
-  if (!res.ok) {
-    const errText = await res.text();
-    console.error("API error:", errText);
-    return null;
-  }
-
-  const data = await res.json();
-
-  apiState.currentExercise = data;
-
-  if (data.id && !apiState.usedIds.includes(data.id)) {
-    apiState.usedIds.push(data.id);
-  }
-
-  console.log("Exercise from API:", data);
-
-  return data;
-}
   init();
 })();
 </script>
