@@ -1580,15 +1580,17 @@ A1: {
 
   async function fetchExerciseFromApi() {
 
-  const payload = {
-    level: apiState.level,
-    topic: apiState.topic,
-    sourceType: "preset",
-    usedIds: apiState.usedIds
-  };
+const sentence = document.getElementById("customSentence").value.trim();
 
-  if (apiState.sentenceCs) {
-    payload.sentenceCs = apiState.sentenceCs;
+const payload = {
+  level: levelSel.value,
+  topic: topicSel.value,
+  sourceType: sentence ? "custom" : "preset",
+  usedIds: apiState.usedIds
+};
+
+if (sentence) {
+  payload.sentenceCs = sentence;
   }
 
   const res = await fetch("/api/exercise", {
