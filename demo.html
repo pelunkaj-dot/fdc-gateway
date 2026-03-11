@@ -1048,6 +1048,7 @@ A1: {
     const level = levelSel.value;
     const topics = DB[level] || {};
     const keys = Object.keys(topics);
+    console.log("DEBUG topics", level, keys);
     const prev = topicSel.value;
 
     topicSel.innerHTML = "";
