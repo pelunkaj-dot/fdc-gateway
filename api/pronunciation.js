@@ -189,7 +189,9 @@ const compareText = (expectedText, transcript) => {
 
 // For the new project, do not reuse one heard word for repeated expected words.
 function compareTextInOrder(expectedText, transcript) {
-  const clean = text => normalize(text.replace(/[’‘]/g, "'"));
+  // Whisper may write a spoken number as a digit (e.g. three -> 3).
+  const numberWords = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty'];
+  const clean = text => normalize(text.replace(/[’‘]/g, "'").replace(/\b(?:[0-9]|1[0-9]|20)\b/g, n => numberWords[Number(n)]));
   const expected = clean(expectedText).split(/\s+/).filter(Boolean);
   const heard = clean(transcript).split(/\s+/).filter(Boolean);
   const words = expected.map((word, index) => ({ word, heard: heard[index] || '', ok: wordsMatch(word, heard[index] || '') }));

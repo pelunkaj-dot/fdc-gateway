@@ -158,3 +158,12 @@ test('Secondary diagnostic failure retains the successful primary assessment', a
   }, env), { expectedText: 'red', language: 'en-GB', phoneticAssessment: 'true' });
   assert.equal(res.body.pronunciation.status, 'assessed'); assert.equal(res.body.pronunciation.diagnostics.status, 'unavailable');
 });
+test('Spoken three transcribed as 3 remains correct content', async () => {
+  const res = await request(loadHandler(async url => url.includes('openai') ? Response.json({ text: '3.' }) : Response.json(fixture('three')), env), { expectedText: 'three', phoneticAssessment: 'true' });
+  assert.equal(res.body.contentScore, 100);
+});
+test('Confirmed consonant substitution blocks acceptance despite strong aggregates', () => {
+  const p = parseAzureResult(fixture('dog'), 'en-GB');
+  p.issues = [{ type: 'voicing', word: 'dog', expected: 'g', heard: 'k', accuracyScore: 54, tip: 'Zkus G s hlasem.' }];
+  assert.equal(childFeedback({ score: 100 }, p).passed, false);
+});
