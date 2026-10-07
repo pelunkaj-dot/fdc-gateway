@@ -1,4 +1,4 @@
-# Pronunciation Assessment integration — prepared, activation pending
+# Pronunciation Assessment integration — deployed 2026-10-07
 
 Only Fajn angličtina s Terezkou a Matýskem opts in. Other callers continue using
 Whisper and the existing response shape, with no Azure calls.
@@ -6,13 +6,13 @@ Whisper and the existing response shape, with no Azure calls.
 Server configuration, exclusively in Vercel environment variables:
 
 - `AZURE_SPEECH_KEY`: Speech resource key, never committed or sent to clients.
-- `AZURE_SPEECH_REGION`: region identifier, e.g. `westeurope`.
+- `AZURE_SPEECH_REGION`: `northeurope` for the dedicated resource.
 - `OPENAI_API_KEY`: keep existing Whisper key.
 
 Prefer a dedicated Speech resource on F0. Do not choose a paid tier without the
 owner's confirmation if F0 cannot be created. No prosody or paid add-ons requested.
 Microsoft currently lists 5 free speech-to-text audio hours/month on F0; verify
-the actual resource SKU and usage before activation. Weak British results may
+the current limits before changing the resource SKU. Weak British results may
 use two sequential assessments, consuming audio quota twice. Existing Whisper
 and TTS usage remains separately billed through OpenAI.
 
@@ -49,7 +49,7 @@ requests. Tests cover all eight requested words, weak R/TH/G/vowels, flat/nested
 responses, omissions, missing phonemes, fallback, PCM validation, content matching,
 legacy clients and British primary/US diagnostics. These are NOT acoustic tests.
 
-## Required before calling this finished
+## Production activation and live smoke tests
 
 1. Create/verify F0 Speech resource and add credentials in Vercel.
 2. Deploy backend preview and verify actual response format and named diagnostics.
@@ -61,8 +61,54 @@ legacy clients and British primary/US diagnostics. These are NOT acoustic tests.
 5. Verify production Vercel and GitHub Pages, including mobile WAV decoding,
    recording UX and microphone permission/no-speech errors.
 
-Activation and live acoustic validation are currently blocked by Azure/Vercel
-sign-in. No production deployment is claimed.
+Activated dedicated `fajn-anglictina-speech`, resource group
+`rg-fajn-anglictina-speech`, North Europe, Free F0. Vercel has the key as a
+Secret for Production and Preview and the region as Config. No paid SKU or
+add-ons selected. Backend production commit `85b060c`; frontend `4dd13b3`.
+GitHub Pages build completed successfully; deployed lesson UI and new shared
+script loaded without application JavaScript errors.
+
+40 backend and 5 frontend unit/integration tests passed. Live requests used
+synthetic OpenAI TTS samples, converted with ffmpeg to mono PCM16/16 kHz.
+These are service smoke tests, not validation on real children:
+
+| Audio input | Expected | Azure PronScore | Outcome |
+| --- | --- | ---: | --- |
+| frog | frog | 100 | Great |
+| red | red | 100 | Great |
+| rabbit | rabbit | 100 | Great |
+| dog | dog | 80.8 | Retry; British score penalized US vowel |
+| three | three | 79.6 | Retry; British score lower than US diagnostic |
+| think | think | 100 | Great |
+| this | this | 92.8 | Great |
+| water | water | 100 | Great |
+| dock | dog | 82 | Rejected; diagnostic G -> K, voicing advice |
+| tree | three | 80.2 | Rejected; diagnostic TH -> T, articulation advice |
+| sink | think | 81.4 | Rejected; diagnostic TH -> S and weak vowel |
+| dis | this | 0 | Rejected; no useful substitution diagnosis |
+| diss | this | — | Rejected; diagnostic TH -> D |
+| zis | this | — | Rejected; diagnostic TH -> Z and weak vowel |
+| reed | red | — | Rejected; diagnostic vowel ɛ -> i |
+| robbit | rabbit | — | Rejected; no specific phoneme diagnosis |
+
+Whisper transcribed three as `3.`; number normalization now preserves correct
+content recognition. Confirmed consonant substitutions and very weak R
+practice block acceptance even if aggregate scores are high. Empty British
+phoneme labels/candidates are omitted; scores remain available, named IPA
+and candidates appear in successful US diagnostics.
+
+Live invalid/missing Azure WAV returned Whisper content recognition, status
+`unavailable`, feedback `content-only`, passed false. Legacy request still
+returned its original response shape. Mocked HTTP 401/429/500 and timeouts
+also verify provider-error fallback.
+
+Still unverified: detection of actual Czech trilled R, Czech vowel quality,
+all TH substitutions in human speech, real child calibration, and recording
+on physical mobile devices. US TTS can receive a retry from British primary
+assessment despite good US pronunciation. Do not describe these smoke tests
+as proof that all typical Czech errors are reliably detected. The recording
+UX was preserved in code (countdown, beep, speak cue, silence stop, assessing).
+The numbered checklist above remains the human/mobile acceptance checklist.
 
 Sources:
 https://learn.microsoft.com/en-us/azure/ai-services/speech-service/rest-speech-to-text-short
