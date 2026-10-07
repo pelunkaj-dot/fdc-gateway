@@ -251,3 +251,27 @@ test('Clear accepted British sounds get praise without an unsupported retry inst
   const weak = childFeedback({ score: 100 }, p);
   assert.equal(weak.needsPractice, true); assert.match(weak.title, /zkus ještě/);
 });
+
+function sentenceFixture(change = {}) {
+  const p = fixture('dog'); p.NBest[0].Lexical = 'my bag is blue';
+  p.NBest[0].Words = ['my','bag','is','blue'].map(word => {
+    const w = fixture('dog', word === 'bag' ? change : {}).NBest[0].Words[0]; w.Word = word; return w;
+  }); return p;
+}
+test('Exact British sentence recognition and strong phonemes resolve Whisper back/bag disagreement', async () => {
+  const res = await request(loadHandler(async url => url.includes('openai') ? Response.json({text:'my back is blue'}) : Response.json(sentenceFixture()), env), {expectedText:'My bag is blue.',language:'en-GB',phoneticAssessment:'true'});
+  assert.equal(res.body.contentScore,100); assert.equal(res.body.feedback.passed,true);
+  assert.equal(res.body.contentSource,'azure-phonetic-confirmed');
+  assert.equal(res.body.transcript,'my back is blue');
+});
+test('Sentence agreement never overrides a confirmed G/K phoneme error', async () => {
+  const res = await request(loadHandler(async url => url.includes('openai') ? Response.json({text:'my back is blue'}) : Response.json(sentenceFixture({index:2,heard:'k'})), env), {expectedText:'My bag is blue.',language:'en-GB',phoneticAssessment:'true'});
+  assert.equal(res.body.feedback.passed,false); assert.equal(res.body.contentSource,'whisper');
+});
+test('Every expected sentence word must have its own assessment before reconciliation', async () => {
+  const p = sentenceFixture(); p.NBest[0].Words.splice(2,1);
+  const res = await request(loadHandler(async url => url.includes('openai') ? Response.json({text:'my bag blue'}) : Response.json(p), env), {expectedText:'My bag is blue.',language:'en-GB',phoneticAssessment:'true'});
+  assert.equal(res.body.feedback.passed,false); assert.equal(res.body.contentSource,'whisper');
+  assert.match(res.body.feedback.title,/Hlásky se povedly/);
+  assert.match(res.body.feedback.tip,/Rozpoznáním celé věty/);
+});

@@ -34,9 +34,9 @@ never replace British scores or grant accent acceptance. Named phonemes and
 spoken-phoneme candidates are supported by Azure for en-US. A weak GB word
 can request secondary US consonant diagnostics. US vowel issues and optional
 word-final R are excluded because they can conflict with British pronunciation.
-For an isolated word, a Whisper disagreement can be reconciled only by exact
+For a word or a complete sentence, a Whisper disagreement can be reconciled only by exact
 Azure recognized text AND a complete passing British result with every phoneme at least 80. Reference
-text or high aggregates alone cannot override it. Preserve original Whisper
+text or high aggregates alone cannot override it. Require assessed words to match every expected word in order. Preserve original Whisper
 transcript and disagreement score for diagnostics. Do not diagnose a
 Czech trill from a low R score: it supports R practice advice, not proof of a
 trill. N-best substitution scores are model scores, not calibrated probabilities.
@@ -144,3 +144,9 @@ thresholds remain unchanged. No US score contributes to this acceptance rule.
 References: https://dictionary.cambridge.org/pronunciation/english/dad
 https://dictionary.cambridge.org/pronunciation/english/dog
 https://dictionary.cambridge.org/pronunciation/english/three
+
+Sentence correction: exact British recognized text with a complete per-word and
+strong per-phoneme assessment can reconcile Whisper disagreement inside a
+sentence. Missing words or weak/confirmed substitution phonemes prevent it.
+Unresolved content uncertainty is labelled separately from successful phonemes.
+51 backend and 15 frontend regression tests pass after this change.

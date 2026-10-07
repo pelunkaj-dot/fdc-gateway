@@ -238,13 +238,14 @@ module.exports = async function handler(req, res) {
     const [transcript, pronunciation] = await Promise.all([transcribeWithWhisper(audioBuffer, language, mimeType), azurePromise]);
     const result = requested ? compareTextInOrder(expectedText, transcript) : compareText(expectedText, transcript);
     if (requested) {
-      // Short isolated words are difficult for Whisper. Reconcile only when
+      // Whisper can misrecognize words inside a sentence too. Reconcile only when
       // Azure also recognizes the exact word AND the British phonemes are strong.
       // Reference text alone, or a high aggregate alone, cannot override content.
       result.contentSource = 'whisper';
       const azureContent = compareTextInOrder(expectedText, pronunciation.recognizedText || '');
-      if (result.score < 100 && normalize(expectedText).split(' ').length === 1 &&
+      if (result.score < 100 &&
           normalize(expectedText) === normalize(pronunciation.recognizedText || '') &&
+          normalize(pronunciation.words.map(w => w.word).join(' ')) === normalize(expectedText) &&
           pronunciation.locale === 'en-GB' && childFeedback(azureContent, pronunciation).passed &&
           pronunciation.words.every(w => w.phonemes.length > 0 && w.phonemes.every(p => p.accuracyScore !== null && p.accuracyScore >= 80))) {
         result.whisperContentScore = result.score;
