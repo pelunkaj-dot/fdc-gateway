@@ -239,13 +239,14 @@ module.exports = async function handler(req, res) {
     const result = requested ? compareTextInOrder(expectedText, transcript) : compareText(expectedText, transcript);
     if (requested) {
       // Short isolated words are difficult for Whisper. Reconcile only when
-      // Azure also recognizes the exact word AND all phonetic gates earn great.
+      // Azure also recognizes the exact word AND the British phonemes are strong.
       // Reference text alone, or a high aggregate alone, cannot override content.
       result.contentSource = 'whisper';
       const azureContent = compareTextInOrder(expectedText, pronunciation.recognizedText || '');
       if (result.score < 100 && normalize(expectedText).split(' ').length === 1 &&
           normalize(expectedText) === normalize(pronunciation.recognizedText || '') &&
-          childFeedback(azureContent, pronunciation).level === 'great') {
+          pronunciation.locale === 'en-GB' && childFeedback(azureContent, pronunciation).passed &&
+          pronunciation.words.every(w => w.phonemes.length > 0 && w.phonemes.every(p => p.accuracyScore !== null && p.accuracyScore >= 80))) {
         result.whisperContentScore = result.score;
         result.score = azureContent.score;
         result.words = azureContent.words;

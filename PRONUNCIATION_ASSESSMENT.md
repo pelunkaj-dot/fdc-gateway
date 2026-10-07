@@ -35,7 +35,7 @@ spoken-phoneme candidates are supported by Azure for en-US. A weak GB word
 can request secondary US consonant diagnostics. US vowel issues and optional
 word-final R are excluded because they can conflict with British pronunciation.
 For an isolated word, a Whisper disagreement can be reconciled only by exact
-Azure recognized text AND a complete great British phonetic result. Reference
+Azure recognized text AND a complete passing British result with every phoneme at least 80. Reference
 text or high aggregates alone cannot override it. Preserve original Whisper
 transcript and disagreement score for diagnostics. Do not diagnose a
 Czech trill from a low R score: it supports R practice advice, not proof of a
@@ -74,7 +74,7 @@ add-ons selected. Backend production commit `85b060c`; frontend `4dd13b3`.
 GitHub Pages build completed successfully; deployed lesson UI and new shared
 script loaded without application JavaScript errors.
 
-44 backend and 8 frontend unit/integration tests passed. Live requests used
+47 backend and 8 frontend unit/integration tests passed. Live requests used
 synthetic OpenAI TTS samples, converted with ffmpeg to mono PCM16/16 kHz.
 These are service smoke tests, not validation on real children:
 
@@ -128,3 +128,19 @@ https://azure.microsoft.com/en-us/pricing/details/speech/
 Single words are repeated as a whole, never automatically split into syllables.
 Uncertain recognition is described as uncertainty, not proof of bad pronunciation.
 The child UI names the known D/A/D sequence for dad and exposes no percentages.
+
+## British reference regression (Cambridge UK audio)
+
+- dad: GB word accuracy 68, phonemes 100/85/96. Former aggregate gate rejected it.
+- dog: GB accuracy 94, phonemes 100/96/100. Whisper heard Joke; exact Azure
+  recognition plus strong GB phonemes resolves the isolated-word conflict.
+- three: GB accuracy 59, phonemes 87.2/89/82, aggregate Mispronunciation and
+  PronScore 11.8. This is an aggregate/phoneme contradiction in a UK reference.
+
+Partial success now uses GB phonemes >=80, word/accuracy >=55, no omissions,
+no confirmed consonant substitution and no failed requested diagnostic. It
+can override aggregate Mispronunciation, never missing/inserted words. Great
+thresholds remain unchanged. No US score contributes to this acceptance rule.
+References: https://dictionary.cambridge.org/pronunciation/english/dad
+https://dictionary.cambridge.org/pronunciation/english/dog
+https://dictionary.cambridge.org/pronunciation/english/three

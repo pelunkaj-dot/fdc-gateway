@@ -176,6 +176,7 @@ test('Strong US assessment never replaces the British pronunciation grade', asyn
       p.NBest[0].PronunciationAssessment.AccuracyScore = 68;
       p.NBest[0].PronunciationAssessment.PronScore = 80.8;
       p.NBest[0].Words[0].PronunciationAssessment.AccuracyScore = 68;
+      p.NBest[0].Words[0].Phonemes[1].PronunciationAssessment.AccuracyScore = 79;
     }
     return Response.json(p);
   }, env), { expectedText: 'dog', language: 'en-GB', phoneticAssessment: 'true' });
@@ -189,7 +190,7 @@ test('Exact Azure recognition plus strong phonemes can resolve isolated Whisper 
   const res = await request(loadHandler(async url => {
     if (url.includes('openai')) return Response.json({ text: 'read' });
     const p = fixture('red'); p.NBest[0].Lexical = 'red'; return Response.json(p);
-  }, env), { expectedText: 'red', phoneticAssessment: 'true' });
+  }, env), { expectedText: 'red', language: 'en-GB', phoneticAssessment: 'true' });
   assert.equal(res.body.feedback.passed, true);
   assert.equal(res.body.contentScore, 100);
   assert.equal(res.body.whisperContentScore, 0);
@@ -211,4 +212,30 @@ test('Reference agreement cannot override a wrong word with a weak vowel', async
 test('High scores without exact recognition cannot override Whisper disagreement', async () => {
   const res = await request(loadHandler(async url => url.includes('openai') ? Response.json({ text: 'read' }) : Response.json(fixture('red')), env), { expectedText: 'red', phoneticAssessment: 'true' });
   assert.equal(res.body.feedback.passed, false);
+});
+
+// Recorded UK dictionary reference, not an American accent acceptance fixture.
+test('British dad with clear phonemes and low aggregate earns partial success', () => {
+  const p = { status: 'assessed', locale: 'en-GB', pronunciationScore: 80.8, accuracyScore: 68,
+    words: [{ word: 'dad', accuracyScore: 68, errorType: 'None', phonemes: [100,85,96].map(accuracyScore => ({ accuracyScore })) }], issues: [] };
+  assert.equal(childFeedback({ score: 100 }, p).level, 'good');
+  p.words[0].phonemes[1].accuracyScore = 64;
+  assert.equal(childFeedback({ score: 100 }, p).passed, false);
+});
+test('American grades do not receive the British clear-sounds adjustment', () => {
+  const p = parseAzureResult(fixture('dog'), 'en-US');
+  p.accuracyScore = 68; p.words[0].accuracyScore = 68;
+  assert.equal(childFeedback({ score: 100 }, p).passed, false);
+});
+
+test('British three with strong phonemes earns partial success despite aggregate mispronunciation', () => {
+  const p = { status: 'assessed', locale: 'en-GB', pronunciationScore: 11.8, accuracyScore: 59,
+    words: [{ word: 'three', accuracyScore: 59, errorType: 'Mispronunciation', phonemes: [87.2,89,82].map(accuracyScore => ({ accuracyScore })) }], issues: [], diagnostics: { status: 'assessed' } };
+  assert.equal(childFeedback({ score: 100 }, p).level, 'good');
+  p.issues = [{ type: 'th-substitution', accuracyScore: 19, tip: 'Zkus TH.' }];
+  assert.equal(childFeedback({ score: 100 }, p).passed, false);
+  p.issues = []; p.diagnostics.status = 'unavailable';
+  assert.equal(childFeedback({ score: 100 }, p).passed, false);
+  p.diagnostics.status = 'assessed'; p.words[0].errorType = 'Omission';
+  assert.equal(childFeedback({ score: 100 }, p).passed, false);
 });
