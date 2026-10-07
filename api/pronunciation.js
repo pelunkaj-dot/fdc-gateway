@@ -2,10 +2,12 @@
  * api/pronunciation.js  —  Vercel Serverless Function
  * ─────────────────────────────────────────────────────
  * Přijme audio nahrávku (audio/webm), přepíše ji přes OpenAI Whisper,
- * porovná s očekávaným textem a vrátí skóre + analýzu slov.
+ * porovná s očekávaným textem a volitelně hodnotí hlásky přes Azure.
+ * Opt-in: phoneticAssessment=true + audioWav (mono PCM16 WAV 16 kHz).
  *
  * ENV proměnné (nastav v Vercel Dashboard → Settings → Environment Variables):
- *   OPENAI_API_KEY   váš OpenAI API klíč
+ *   OPENAI_API_KEY   stávající klíč
+ *   AZURE_SPEECH_KEY a AZURE_SPEECH_REGION pouze v serverovém prostředí
  *
  * Očekávaný request:  POST multipart/form-data
  *   audio        — Blob (audio/webm)
@@ -17,11 +19,7 @@
  */
 
 const Busboy = require('busboy');
-
-// Zakáže vestavěný bodyParser — budeme parsovat multipart sami
-export const config = {
-  api: { bodyParser: false },
-};
+const { parseAzureResult, childFeedback } = require('../lib/pronunciation-assessment');
 
 // ── Pomocné funkce ──────────────────────────────────────────────────────────
 
@@ -65,89 +63,103 @@ const makeTip = (wrongWords) => {
 
 const parseForm = (req) =>
   new Promise((resolve, reject) => {
-    const bb = Busboy({ headers: req.headers, limits: { fileSize: 10 * 1024 * 1024 } });
+    let bb;
+    try { bb = Busboy({ headers: req.headers, limits: { files: 2, fileSize: 2 * 1024 * 1024, fields: 4, fieldSize: 2000, parts: 6 } }); }
+    catch { reject(new Error('invalid-form')); return; }
     const fields = {};
-    const chunks = [];
-
-    bb.on('field', (name, val) => { fields[name] = val; });
-    bb.on('file', (_name, stream) => {
-      stream.on('data', (chunk) => chunks.push(chunk));
-      stream.on('end', () => {});
+    const files = {};
+    let invalid = false;
+    bb.on('field', (name, val, info) => { if (info.valueTruncated) invalid = true; fields[name] = val; });
+    bb.on('file', (name, stream, info) => {
+      const chunks = [];
+      if (files[name]) invalid = true;
+      files[name] = { mimeType: info.mimeType };
+      stream.on('limit', () => { invalid = true; });
+      stream.on('data', chunk => chunks.push(chunk));
+      stream.on('end', () => { files[name].buffer = Buffer.concat(chunks); });
       stream.on('error', reject);
     });
-    bb.on('finish', () => resolve({ fields, audioBuffer: Buffer.concat(chunks) }));
+    for (const event of ['filesLimit', 'fieldsLimit', 'partsLimit']) bb.on(event, () => { invalid = true; });
+    bb.on('finish', () => invalid ? reject(new Error('invalid-form')) : resolve({ fields, audioBuffer: files.audio?.buffer, mimeType: files.audio?.mimeType, wavBuffer: files.audioWav?.buffer }));
     bb.on('error', reject);
-
+    req.on('aborted', () => reject(new Error('invalid-form')));
     req.pipe(bb);
   });
 
+// Validate PCM WAV instead of trusting a MIME label. Maximum 15 seconds.
+function isAssessmentWav(b) {
+  if (!b || b.length < 44 || b.toString('ascii', 0, 4) !== 'RIFF' || b.toString('ascii', 8, 12) !== 'WAVE') return false;
+  if (b.readUInt32LE(4) + 8 !== b.length) return false;
+  let fmt = false, bytes = 0;
+  for (let i = 12; i + 8 <= b.length;) {
+    const kind = b.toString('ascii', i, i + 4), n = b.readUInt32LE(i + 4);
+    if (i + 8 + n > b.length) return false;
+    if (kind === 'fmt ') {
+      if (n < 16) return false;
+      fmt = b.readUInt16LE(i + 8) === 1 && b.readUInt16LE(i + 10) === 1 && b.readUInt32LE(i + 12) === 16000 && b.readUInt32LE(i + 16) === 32000 && b.readUInt16LE(i + 20) === 2 && b.readUInt16LE(i + 22) === 16;
+    }
+    if (kind === 'data') bytes += n;
+    i += 8 + n + (n % 2);
+  }
+  return fmt && bytes >= 3200 && bytes <= 15 * 32000 && bytes % 2 === 0;
+}
+
+async function assessWithAzure(wavBuffer, expectedText, language) {
+  const key = process.env.AZURE_SPEECH_KEY;
+  const region = process.env.AZURE_SPEECH_REGION;
+  if (!key || !region || !/^[a-z0-9-]+$/.test(region)) throw new Error('azure-not-configured');
+  if (!isAssessmentWav(wavBuffer)) throw new Error('azure-audio-unavailable');
+  const locale = language === 'en-US' ? 'en-US' : 'en-GB';
+  const params = { ReferenceText: expectedText, GradingSystem: 'HundredMark', Granularity: 'Phoneme', Dimension: 'Comprehensive', EnableMiscue: true, PhonemeAlphabet: 'IPA', NBestPhonemeCount: 5 };
+  const response = await fetch(`https://${region}.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=${locale}&format=detailed`, {
+    method: 'POST', signal: AbortSignal.timeout(10000),
+    headers: { 'Ocp-Apim-Subscription-Key': key, 'Pronunciation-Assessment': Buffer.from(JSON.stringify(params)).toString('base64'), 'Content-Type': 'audio/wav; codecs=audio/pcm; samplerate=16000', Accept: 'application/json' },
+    body: wavBuffer,
+  });
+  if (!response.ok) throw new Error(`azure-http-${response.status}`);
+  return parseAzureResult(await response.json(), locale);
+}
+
+async function assessEnglishSpeech(wavBuffer, expectedText, language) {
+  const primary = await assessWithAzure(wavBuffer, expectedText, language);
+  // GB stays authoritative. Azure names IPA phonemes only for US English.
+  // Request a US diagnostic only for a weak GB word, never lower a score for accent differences.
+  if (primary.status === 'assessed' && primary.locale === 'en-GB') {
+    const weakWords = primary.words.filter(w => w.accuracyScore < 80 || w.phonemes.some(p => p.accuracyScore !== null && p.accuracyScore < 75));
+    if (weakWords.length) {
+      try {
+        const diagnostic = await assessWithAzure(wavBuffer, expectedText, 'en-US');
+        primary.diagnostics = { locale: 'en-US', words: diagnostic.words, status: diagnostic.status };
+        primary.issues = diagnostic.issues.filter(issue => weakWords.some(w => w.word.toLowerCase() === issue.word.toLowerCase()))
+          // A final US R in e.g. water is not required in British pronunciation.
+          .filter(issue => !(issue.type === 'r-practice' && /r$/i.test(issue.word) && !/^r/i.test(issue.word)))
+          .map(issue => ({ ...issue, diagnosticLocale: 'en-US' }));
+      } catch { primary.diagnostics = { locale: 'en-US', status: 'unavailable', words: [] }; }
+    }
+  }
+  return primary;
+}
+
 // ── Whisper transkripce ─────────────────────────────────────────────────────
 
-const transcribeWithWhisper = async (audioBuffer, language) => {
+const transcribeWithWhisper = async (audioBuffer, language, mimeType = 'audio/webm') => {
   const OPENAI_KEY = process.env.OPENAI_API_KEY;
   if (!OPENAI_KEY) throw new Error('OPENAI_API_KEY není nastaven v Vercel env vars');
 
-  // Sestavíme multipart ručně — Node.js fetch FormData
-  const boundary = `----WhistlerBoundary${Date.now()}`;
-  const langCode = (language || 'en').split('-')[0]; // 'en-GB' → 'en'
-
-  const bodyParts = [
-    `--${boundary}\r\nContent-Disposition: form-data; name="model"\r\n\r\nwhisper-1`,
-    `--${boundary}\r\nContent-Disposition: form-data; name="language"\r\n\r\n${langCode}`,
-    `--${boundary}\r\nContent-Disposition: form-data; name="response_format"\r\n\r\njson`,
-    // audio soubor
-    `--${boundary}\r\nContent-Disposition: form-data; name="file"; filename="audio.webm"\r\nContent-Type: audio/webm\r\n\r\n`,
-  ];
-
-  const textPart = Buffer.from(bodyParts.join('\r\n') + '\r\n', 'utf8');
-  // Pozn: první join odděluje části, ale file part musí být těsně před binarním blokem
-  const preText = Buffer.from(
-    bodyParts.slice(0, 3).map((p) => p + '\r\n').join('') +
-      bodyParts[3] +
-      '',
-    'utf8'
-  );
-  // Sestavíme správně
-  const pre = [
-    `--${boundary}`,
-    'Content-Disposition: form-data; name="model"',
-    '',
-    'whisper-1',
-    `--${boundary}`,
-    'Content-Disposition: form-data; name="language"',
-    '',
-    langCode,
-    `--${boundary}`,
-    'Content-Disposition: form-data; name="response_format"',
-    '',
-    'json',
-    `--${boundary}`,
-    'Content-Disposition: form-data; name="file"; filename="audio.webm"',
-    'Content-Type: audio/webm',
-    '',
-    '',
-  ].join('\r\n');
-
-  const post = `\r\n--${boundary}--\r\n`;
-
-  const body = Buffer.concat([
-    Buffer.from(pre, 'utf8'),
-    audioBuffer,
-    Buffer.from(post, 'utf8'),
-  ]);
-
+  const type = ['audio/wav', 'audio/ogg', 'audio/mp4', 'audio/webm'].includes(mimeType) ? mimeType : 'audio/webm';
+  const extension = { 'audio/wav': 'wav', 'audio/ogg': 'ogg', 'audio/mp4': 'mp4', 'audio/webm': 'webm' }[type];
+  const form = new FormData();
+  form.append('model', 'whisper-1');
+  form.append('language', (language || 'en').split('-')[0]);
+  form.append('response_format', 'json');
+  form.append('file', new Blob([audioBuffer], { type }), `audio.${extension}`);
   const resp = await fetch('https://api.openai.com/v1/audio/transcriptions', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${OPENAI_KEY}`,
-      'Content-Type': `multipart/form-data; boundary=${boundary}`,
-    },
-    body,
+    method: 'POST', signal: AbortSignal.timeout(18000),
+    headers: { Authorization: `Bearer ${OPENAI_KEY}` }, body: form,
   });
 
   if (!resp.ok) {
-    const errText = await resp.text();
-    throw new Error(`Whisper API selhalo (${resp.status}): ${errText}`);
+    throw new Error(`whisper-http-${resp.status}`);
   }
 
   const json = await resp.json();
@@ -175,6 +187,16 @@ const compareText = (expectedText, transcript) => {
   return { score, transcript, words, tip };
 };
 
+// For the new project, do not reuse one heard word for repeated expected words.
+function compareTextInOrder(expectedText, transcript) {
+  const clean = text => normalize(text.replace(/[’‘]/g, "'"));
+  const expected = clean(expectedText).split(/\s+/).filter(Boolean);
+  const heard = clean(transcript).split(/\s+/).filter(Boolean);
+  const words = expected.map((word, index) => ({ word, heard: heard[index] || '', ok: wordsMatch(word, heard[index] || '') }));
+  const correct = words.filter(w => w.ok).length;
+  return { score: Math.round(100 * correct / Math.max(expected.length, heard.length, 1)), transcript, words, tip: makeTip(words.filter(w => !w.ok)) };
+}
+
 // ── Handler ─────────────────────────────────────────────────────────────────
 
 module.exports = async function handler(req, res) {
@@ -190,24 +212,47 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const { fields, audioBuffer } = await parseForm(req);
+    const { fields, audioBuffer, mimeType, wavBuffer } = await parseForm(req);
     const expectedText = fields.expectedText || '';
     const language     = fields.language || 'en-GB';
 
     if (!audioBuffer || audioBuffer.length < 100) {
       return res.status(400).json({ error: 'Audio soubor chybí nebo je prázdný' });
     }
-    if (!expectedText) {
+    if (!expectedText.trim() || expectedText.length > 500) {
       return res.status(400).json({ error: 'expectedText chybí' });
     }
 
-    const transcript = await transcribeWithWhisper(audioBuffer, language);
-    const result     = compareText(expectedText, transcript);
+    const requested = fields.phoneticAssessment === 'true' && /^en(?:-GB|-US)?$/.test(language);
+    // Whisper receives no reference prompt. Content recognition remains independent.
+    // Non-opted-in clients keep their existing response and do not call Azure.
+    const azurePromise = requested ? assessEnglishSpeech(wavBuffer, expectedText, language).catch(err => {
+      // Log only a bounded error category, never keys, provider bodies or child audio/text.
+      const reason = /^azure-(?:http-\d{3}|not-configured|audio-unavailable|invalid-result|missing-result|missing-scores|missing-words)$/.test(err.message) ? err.message : 'azure-unavailable';
+      console.warn('[pronunciation]', reason);
+      return { status: 'unavailable', reason, pronunciationScore: null, words: [], issues: [] };
+    }) : null;
+    const [transcript, pronunciation] = await Promise.all([transcribeWithWhisper(audioBuffer, language, mimeType), azurePromise]);
+    const result = requested ? compareTextInOrder(expectedText, transcript) : compareText(expectedText, transcript);
+    if (requested) {
+      result.contentScore = result.score;
+      result.pronunciation = pronunciation;
+      result.pronunciationScore = pronunciation.pronunciationScore;
+      result.feedback = childFeedback(result, pronunciation);
+      // Keep a familiar score field for compatibility, while child UI uses feedback.
+      if (pronunciation.status === 'assessed') {
+        result.score = Math.min(result.contentScore, Math.round(pronunciation.pronunciationScore), result.feedback.level === 'great' ? 100 : result.feedback.level === 'good' ? 79 : 59);
+      } else if (pronunciation.status === 'no-match') result.score = 0;
+      result.tip = result.feedback.tip;
+    }
 
     return res.status(200).json(result);
 
   } catch (err) {
-    console.error('[pronunciation API]', err.message);
-    return res.status(500).json({ error: err.message });
+    const invalid = err.message === 'invalid-form';
+    console.error('[pronunciation API]', invalid ? 'invalid-form' : 'assessment-failed');
+    return res.status(invalid ? 400 : 503).json({ error: invalid ? 'Nahrávku se nepodařilo načíst.' : 'Hlas se teď nepodařilo zkontrolovat. Zkus to znovu.' });
   }
 };
+
+export const config = { api: { bodyParser: false }, maxDuration: 30 };
