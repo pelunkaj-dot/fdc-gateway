@@ -239,3 +239,15 @@ test('British three with strong phonemes earns partial success despite aggregate
   p.diagnostics.status = 'assessed'; p.words[0].errorType = 'Omission';
   assert.equal(childFeedback({ score: 100 }, p).passed, false);
 });
+
+test('Clear accepted British sounds get praise without an unsupported retry instruction', () => {
+  const p = { status: 'assessed', locale: 'en-GB', pronunciationScore: 80.8, accuracyScore: 68,
+    words: [{ word: 'blue', accuracyScore: 68, errorType: 'None', phonemes: [95,90,94].map(accuracyScore => ({ accuracyScore })) }], issues: [] };
+  const f = childFeedback({ score: 100 }, p);
+  assert.equal(f.level, 'good'); assert.equal(f.passed, true); assert.equal(f.needsPractice, false);
+  assert.equal(f.title, 'Dobře, povedlo se!'); assert.match(f.tip, /Můžeš pokračovat/);
+  assert.doesNotMatch(f.title + f.tip, /zkus ještě|zopakuj|znovu/);
+  p.accuracyScore = 78; p.words[0].accuracyScore = 78; p.words[0].phonemes[1].accuracyScore = 70;
+  const weak = childFeedback({ score: 100 }, p);
+  assert.equal(weak.needsPractice, true); assert.match(weak.title, /zkus ještě/);
+});
