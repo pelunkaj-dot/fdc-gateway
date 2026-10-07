@@ -55,8 +55,8 @@ const wordsMatch = (expected, heard) => {
 /** Vygeneruje tip pro nejčastěji špatná slova */
 const makeTip = (wrongWords) => {
   if (wrongWords.length === 0) return null;
-  const samples = wrongWords.slice(0, 2).map((w) => `„${w.word}"`).join(' a ');
-  return `Zaměř se na výslovnost: ${samples}. Zkus opakovat pomaleji po slabikách.`;
+  const samples = wrongWords.slice(0, 2).map((w) => `„${w.word}“`).join(' a ');
+  return `Poslechni si vzor pro ${samples} a zopakuj ho jako celek.`;
 };
 
 // ── Parsování multipart formy bez externích závislostí ──────────────────────
@@ -122,13 +122,17 @@ async function assessWithAzure(wavBuffer, expectedText, language) {
 
 async function assessEnglishSpeech(wavBuffer, expectedText, language) {
   const primary = await assessWithAzure(wavBuffer, expectedText, language);
-  // GB stays authoritative. Azure names IPA phonemes only for US English.
-  // Request a US diagnostic only for a weak GB word, never lower a score for accent differences.
+  // Keep a coherent assessment from one accepted English accent.
+  // Never combine the best individual phonemes from different assessments.
   if (primary.status === 'assessed' && primary.locale === 'en-GB') {
     const weakWords = primary.words.filter(w => w.accuracyScore < 80 || w.phonemes.some(p => p.accuracyScore !== null && p.accuracyScore < 75));
     if (weakWords.length) {
       try {
         const diagnostic = await assessWithAzure(wavBuffer, expectedText, 'en-US');
+        if (diagnostic.status === 'assessed' &&
+            !childFeedback({ score: 100 }, primary).passed && childFeedback({ score: 100 }, diagnostic).passed) {
+          return { ...diagnostic, diagnostics: { locale: primary.locale, words: primary.words, status: primary.status }, accentAlternative: true };
+        }
         primary.diagnostics = { locale: 'en-US', words: diagnostic.words, status: diagnostic.status };
         primary.issues = diagnostic.issues.filter(issue => weakWords.some(w => w.word.toLowerCase() === issue.word.toLowerCase()))
           // A final US R in e.g. water is not required in British pronunciation.
@@ -237,6 +241,20 @@ module.exports = async function handler(req, res) {
     const [transcript, pronunciation] = await Promise.all([transcribeWithWhisper(audioBuffer, language, mimeType), azurePromise]);
     const result = requested ? compareTextInOrder(expectedText, transcript) : compareText(expectedText, transcript);
     if (requested) {
+      // Short isolated words are difficult for Whisper. Reconcile only when
+      // Azure also recognizes the exact word AND all phonetic gates earn great.
+      // Reference text alone, or a high aggregate alone, cannot override content.
+      result.contentSource = 'whisper';
+      const azureContent = compareTextInOrder(expectedText, pronunciation.recognizedText || '');
+      if (result.score < 100 && normalize(expectedText).split(' ').length === 1 &&
+          normalize(expectedText) === normalize(pronunciation.recognizedText || '') &&
+          childFeedback(azureContent, pronunciation).level === 'great') {
+        result.whisperContentScore = result.score;
+        result.score = azureContent.score;
+        result.words = azureContent.words;
+        result.tip = null;
+        result.contentSource = 'azure-phonetic-confirmed';
+      }
       result.contentScore = result.score;
       result.pronunciation = pronunciation;
       result.pronunciationScore = pronunciation.pronunciationScore;

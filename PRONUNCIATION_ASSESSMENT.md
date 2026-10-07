@@ -29,9 +29,15 @@ issues, optional diagnostics) and `feedback` (level, passed, title, tip).
 The existing `score` field is capped for weak phonemes, but is not the raw Azure
 score; use `pronunciationScore` for raw scores. Child UI displays no percentages.
 
-British English stays authoritative. Named phonemes and spoken-phoneme candidates
-are supported by Azure for en-US. A weak GB word can request secondary US
-phoneme diagnostics; those never replace primary GB scores. Do not diagnose a
+British English is the first assessment. Named phonemes and spoken-phoneme
+candidates are supported by Azure for en-US. A weak GB word requests a complete
+US assessment. If GB fails and the complete US result passes the same word,
+phoneme and miscue gates, use the coherent US result. Never mix best individual
+phonemes from different accents. If neither passes, keep GB scores and named
+US diagnostics. For an isolated word, a Whisper disagreement can be reconciled
+only by exact Azure recognized text AND a complete great phonetic result;
+reference text or high aggregates alone cannot override it. Preserve original
+Whisper transcript and disagreement score for diagnostics. Do not diagnose a
 Czech trill from a low R score: it supports R practice advice, not proof of a
 trill. N-best substitution scores are model scores, not calibrated probabilities.
 US word-final R in e.g. water is not a British requirement.
@@ -68,9 +74,11 @@ add-ons selected. Backend production commit `85b060c`; frontend `4dd13b3`.
 GitHub Pages build completed successfully; deployed lesson UI and new shared
 script loaded without application JavaScript errors.
 
-40 backend and 5 frontend unit/integration tests passed. Live requests used
+44 backend and 8 frontend unit/integration tests passed. Live requests used
 synthetic OpenAI TTS samples, converted with ffmpeg to mono PCM16/16 kHz.
 These are service smoke tests, not validation on real children:
+
+Historical smoke results before the accent reconciliation fix:
 
 | Audio input | Expected | Azure PronScore | Outcome |
 | --- | --- | ---: | --- |
@@ -104,8 +112,9 @@ also verify provider-error fallback.
 
 Still unverified: detection of actual Czech trilled R, Czech vowel quality,
 all TH substitutions in human speech, real child calibration, and recording
-on physical mobile devices. US TTS can receive a retry from British primary
-assessment despite good US pronunciation. Do not describe these smoke tests
+on physical mobile devices. The former rejection of good US TTS by British
+primary scores is addressed by coherent accent selection; verify live regression
+with correct dog/three and incorrect dock/tree after deployment. Do not describe these smoke tests
 as proof that all typical Czech errors are reliably detected. The recording
 UX was preserved in code (countdown, beep, speak cue, silence stop, assessing).
 The numbered checklist above remains the human/mobile acceptance checklist.
@@ -114,3 +123,9 @@ Sources:
 https://learn.microsoft.com/en-us/azure/ai-services/speech-service/rest-speech-to-text-short
 https://learn.microsoft.com/en-us/azure/ai-services/speech-service/how-to-pronunciation-assessment
 https://azure.microsoft.com/en-us/pricing/details/speech/
+
+## Feedback correction
+
+Single words are repeated as a whole, never automatically split into syllables.
+Uncertain recognition is described as uncertainty, not proof of bad pronunciation.
+The child UI names the known D/A/D sequence for dad and exposes no percentages.

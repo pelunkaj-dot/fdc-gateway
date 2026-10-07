@@ -167,3 +167,47 @@ test('Confirmed consonant substitution blocks acceptance despite strong aggregat
   p.issues = [{ type: 'voicing', word: 'dog', expected: 'g', heard: 'k', accuracyScore: 54, tip: 'Zkus G s hlasem.' }];
   assert.equal(childFeedback({ score: 100 }, p).passed, false);
 });
+
+test('A complete strong US assessment accepts a legitimate accent alternative', async () => {
+  const res = await request(loadHandler(async url => {
+    if (url.includes('openai')) return Response.json({ text: 'dog' });
+    const p = fixture('dog');
+    if (url.includes('en-GB')) {
+      p.NBest[0].PronunciationAssessment.AccuracyScore = 68;
+      p.NBest[0].PronunciationAssessment.PronScore = 80.8;
+      p.NBest[0].Words[0].PronunciationAssessment.AccuracyScore = 68;
+    }
+    return Response.json(p);
+  }, env), { expectedText: 'dog', language: 'en-GB', phoneticAssessment: 'true' });
+  assert.equal(res.body.feedback.level, 'great');
+  assert.equal(res.body.pronunciation.locale, 'en-US');
+  assert.equal(res.body.pronunciation.accentAlternative, true);
+});
+
+test('Exact Azure recognition plus strong phonemes can resolve isolated Whisper disagreement', async () => {
+  const res = await request(loadHandler(async url => {
+    if (url.includes('openai')) return Response.json({ text: 'read' });
+    const p = fixture('red'); p.NBest[0].Lexical = 'red'; return Response.json(p);
+  }, env), { expectedText: 'red', phoneticAssessment: 'true' });
+  assert.equal(res.body.feedback.passed, true);
+  assert.equal(res.body.contentScore, 100);
+  assert.equal(res.body.whisperContentScore, 0);
+  assert.equal(res.body.contentSource, 'azure-phonetic-confirmed');
+  assert.equal(res.body.transcript, 'read');
+});
+
+test('Reference agreement cannot override a wrong word with a weak vowel', async () => {
+  const res = await request(loadHandler(async url => {
+    if (url.includes('openai')) return Response.json({ text: 'reed' });
+    const p = fixture('red', { index: 1, heard: 'i' }); p.NBest[0].Lexical = 'red'; return Response.json(p);
+  }, env), { expectedText: 'red', phoneticAssessment: 'true' });
+  assert.equal(res.body.feedback.passed, false);
+  assert.equal(res.body.contentScore, 0);
+  assert.match(res.body.feedback.tip, /nerozpoznala dost jistě/);
+  assert.doesNotMatch(res.body.feedback.tip, /slabik/);
+});
+
+test('High scores without exact recognition cannot override Whisper disagreement', async () => {
+  const res = await request(loadHandler(async url => url.includes('openai') ? Response.json({ text: 'read' }) : Response.json(fixture('red')), env), { expectedText: 'red', phoneticAssessment: 'true' });
+  assert.equal(res.body.feedback.passed, false);
+});
