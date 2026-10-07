@@ -93,6 +93,17 @@ async function request(handler, fields = {}, audioWav = wav()) {
   await handler(req, res); return res;
 }
 const env = { AZURE_SPEECH_KEY: 'test-placeholder', AZURE_SPEECH_REGION: 'westeurope' };
+function replyFixture(text){const result=fixture('frog');const best=result.NBest[0];best.Lexical=text.toLowerCase().replace(/[^a-z\s]/g,'');best.Words=text.toLowerCase().replace(/[^a-z\s]/g,'').split(/\s+/).filter(Boolean).map(word=>({Word:word,PronunciationAssessment:{AccuracyScore:94,ErrorType:'None'},Phonemes:[{Phoneme:'a',PronunciationAssessment:{AccuracyScore:94}}]}));return result;}
+test('Dialogue transcribes once, chooses the spoken allowed alternative and grades that exact British reference',async()=>{
+  let transcriptions=0,azure=0;
+  const res=await request(loadHandler(async(url,options)=>{if(url.includes('openai')){transcriptions++;return Response.json({text:'Some water, please.'});}azure++;const params=JSON.parse(Buffer.from(options.headers['Pronunciation-Assessment'],'base64').toString());assert.equal(params.ReferenceText,'Some water, please.');assert.match(url,/en-GB/);return Response.json(replyFixture('Some water, please.'));},env),{expectedText:'Can I have some water, please?',language:'en-GB',phoneticAssessment:'true',responseGroup:'food:want-water'});
+  assert.equal(res.code,200);assert.equal(res.body.feedback.passed,true);assert.equal(res.body.referenceText,'Some water, please.');assert.equal(res.body.transcript,'Some water, please.');assert.equal(transcriptions,1);assert.equal(azure,1);
+});
+test('Wrong meaning cannot pass a dialogue response group; unknown group does not call providers',async()=>{
+  let calls=0;const handler=loadHandler(async url=>{calls++;return url.includes('openai')?Response.json({text:'Some milk, please.'}):Response.json(replyFixture('Some milk, please.'));},env);
+  let res=await request(handler,{expectedText:'Can I have some water, please?',language:'en-GB',phoneticAssessment:'true',responseGroup:'food:want-water'});assert.equal(res.code,200);assert.equal(res.body.feedback.passed,false);
+  const before=calls;res=await request(handler,{expectedText:'frog',language:'en-GB',phoneticAssessment:'true',responseGroup:'unknown'});assert.equal(res.code,400);assert.equal(calls,before);
+});
 test('Legacy caller retains the original shape and never calls Azure', async () => {
   let count = 0;
   const res = await request(loadHandler(async url => { assert.match(url, /api.openai.com/); count++; return Response.json({ text: 'frog' }); }, env));

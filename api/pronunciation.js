@@ -20,6 +20,7 @@
 
 const Busboy = require('busboy');
 const { parseAzureResult, childFeedback } = require('../lib/pronunciation-assessment');
+const { chooseCourseReference, normalizeReply } = require('../lib/course-replies');
 
 // ── Pomocné funkce ──────────────────────────────────────────────────────────
 
@@ -64,7 +65,7 @@ const makeTip = (wrongWords) => {
 const parseForm = (req) =>
   new Promise((resolve, reject) => {
     let bb;
-    try { bb = Busboy({ headers: req.headers, limits: { files: 2, fileSize: 2 * 1024 * 1024, fields: 4, fieldSize: 2000, parts: 6 } }); }
+    try { bb = Busboy({ headers: req.headers, limits: { files: 2, fileSize: 2 * 1024 * 1024, fields: 5, fieldSize: 2000, parts: 7 } }); }
     catch { reject(new Error('invalid-form')); return; }
     const fields = {};
     const files = {};
@@ -104,7 +105,7 @@ function isAssessmentWav(b) {
   return fmt && bytes >= 3200 && bytes <= 15 * 32000 && bytes % 2 === 0;
 }
 
-async function assessWithAzure(wavBuffer, expectedText, language) {
+async function assessWithAzure(wavBuffer, expectedText, language, deadline=Infinity) {
   const key = process.env.AZURE_SPEECH_KEY;
   const region = process.env.AZURE_SPEECH_REGION;
   if (!key || !region || !/^[a-z0-9-]+$/.test(region)) throw new Error('azure-not-configured');
@@ -112,7 +113,7 @@ async function assessWithAzure(wavBuffer, expectedText, language) {
   const locale = language === 'en-US' ? 'en-US' : 'en-GB';
   const params = { ReferenceText: expectedText, GradingSystem: 'HundredMark', Granularity: 'Phoneme', Dimension: 'Comprehensive', EnableMiscue: true, PhonemeAlphabet: 'IPA', NBestPhonemeCount: 5 };
   const response = await fetch(`https://${region}.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=${locale}&format=detailed`, {
-    method: 'POST', signal: AbortSignal.timeout(10000),
+    method: 'POST', signal: AbortSignal.timeout(Math.max(1,Math.min(10000,deadline-Date.now()))),
     headers: { 'Ocp-Apim-Subscription-Key': key, 'Pronunciation-Assessment': Buffer.from(JSON.stringify(params)).toString('base64'), 'Content-Type': 'audio/wav; codecs=audio/pcm; samplerate=16000', Accept: 'application/json' },
     body: wavBuffer,
   });
@@ -120,15 +121,15 @@ async function assessWithAzure(wavBuffer, expectedText, language) {
   return parseAzureResult(await response.json(), locale);
 }
 
-async function assessEnglishSpeech(wavBuffer, expectedText, language) {
-  const primary = await assessWithAzure(wavBuffer, expectedText, language);
+async function assessEnglishSpeech(wavBuffer, expectedText, language, deadline=Infinity) {
+  const primary = await assessWithAzure(wavBuffer, expectedText, language,deadline);
   // British scores remain authoritative, matching the course reference audio.
   // US is used only for named consonant diagnostics, never accent acceptance.
   if (primary.status === 'assessed' && primary.locale === 'en-GB') {
     const weakWords = primary.words.filter(w => w.accuracyScore < 80 || w.phonemes.some(p => p.accuracyScore !== null && p.accuracyScore < 75));
     if (weakWords.length) {
       try {
-        const diagnostic = await assessWithAzure(wavBuffer, expectedText, 'en-US');
+        const diagnostic = await assessWithAzure(wavBuffer, expectedText, 'en-US',deadline);
         primary.diagnostics = { locale: 'en-US', words: diagnostic.words, status: diagnostic.status };
         primary.issues = diagnostic.issues.filter(issue => weakWords.some(w => w.word.toLowerCase() === issue.word.toLowerCase()))
           // A final US R in e.g. water is not required in British pronunciation.
@@ -215,8 +216,9 @@ module.exports = async function handler(req, res) {
   }
 
   try {
+    const startedAt=Date.now();
     const { fields, audioBuffer, mimeType, wavBuffer } = await parseForm(req);
-    const expectedText = fields.expectedText || '';
+    let expectedText = fields.expectedText || '';
     const language     = fields.language || 'en-GB';
 
     if (!audioBuffer || audioBuffer.length < 100) {
@@ -227,16 +229,29 @@ module.exports = async function handler(req, res) {
     }
 
     const requested = fields.phoneticAssessment === 'true' && /^en(?:-GB|-US)?$/.test(language);
+    const replyGroup=fields.responseGroup;
+    if(replyGroup&&(!requested||language!=='en-GB'||!chooseCourseReference(replyGroup,expectedText,''))){
+      return res.status(400).json({error:'Neplatná skupina odpovědí.'});
+    }
+    // Only reviewed alternatives for this exact prompt and chosen picture.
+    // Independent transcription chooses the actual reference before phonetics;
+    // an answer about a different object never becomes an accepted alternative.
+    let courseTranscript=null;
+    if(replyGroup){
+      courseTranscript=await transcribeWithWhisper(audioBuffer,language,mimeType);
+      expectedText=chooseCourseReference(replyGroup,expectedText,courseTranscript);
+    }
     // Whisper receives no reference prompt. Content recognition remains independent.
     // Non-opted-in clients keep their existing response and do not call Azure.
-    const azurePromise = requested ? assessEnglishSpeech(wavBuffer, expectedText, language).catch(err => {
+    const azurePromise = requested ? assessEnglishSpeech(wavBuffer, expectedText, language,replyGroup?startedAt+27000:Infinity).catch(err => {
       // Log only a bounded error category, never keys, provider bodies or child audio/text.
       const reason = /^azure-(?:http-\d{3}|not-configured|audio-unavailable|invalid-result|missing-result|missing-scores|missing-words)$/.test(err.message) ? err.message : 'azure-unavailable';
       console.warn('[pronunciation]', reason);
       return { status: 'unavailable', reason, pronunciationScore: null, words: [], issues: [] };
     }) : null;
-    const [transcript, pronunciation] = await Promise.all([transcribeWithWhisper(audioBuffer, language, mimeType), azurePromise]);
-    const result = requested ? compareTextInOrder(expectedText, transcript) : compareText(expectedText, transcript);
+    const [transcript, pronunciation] = await Promise.all([courseTranscript===null?transcribeWithWhisper(audioBuffer, language, mimeType):Promise.resolve(courseTranscript), azurePromise]);
+    const result = replyGroup ? compareTextInOrder(normalizeReply(expectedText),normalizeReply(transcript)) : requested ? compareTextInOrder(expectedText, transcript) : compareText(expectedText, transcript);
+    if(replyGroup){result.transcript=transcript;result.referenceText=expectedText;}
     if (requested) {
       // Whisper can misrecognize words inside a sentence too. Reconcile only when
       // Azure also recognizes the exact word AND the British phonemes are strong.

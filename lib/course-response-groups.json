@@ -1,0 +1,296 @@
+{
+  "colours:choose-red": [
+    "Red, please.",
+    "I would like red, please.",
+    "I'd like red, please."
+  ],
+  "colours:choose-blue": [
+    "Blue, please.",
+    "I would like blue, please.",
+    "I'd like blue, please."
+  ],
+  "colours:choose-green": [
+    "Green, please.",
+    "I would like green, please.",
+    "I'd like green, please."
+  ],
+  "colours:choose-yellow": [
+    "Yellow, please.",
+    "I would like yellow, please.",
+    "I'd like yellow, please."
+  ],
+  "animals:like-dog": [
+    "I like dogs.",
+    "My favourite animal is a dog.",
+    "I like dogs best.",
+    "A dog.",
+    "Dogs."
+  ],
+  "animals:like-cat": [
+    "I like cats.",
+    "My favourite animal is a cat.",
+    "I like cats best.",
+    "A cat.",
+    "Cats."
+  ],
+  "animals:like-rabbit": [
+    "I like rabbits.",
+    "My favourite animal is a rabbit.",
+    "I like rabbits best.",
+    "A rabbit.",
+    "Rabbits."
+  ],
+  "animals:like-frog": [
+    "I like frogs.",
+    "My favourite animal is a frog.",
+    "I like frogs best.",
+    "A frog.",
+    "Frogs."
+  ],
+  "food:want-water": [
+    "Can I have some water, please?",
+    "Some water, please.",
+    "I would like some water, please."
+  ],
+  "food:want-milk": [
+    "Can I have some milk, please?",
+    "Some milk, please.",
+    "I would like some milk, please."
+  ],
+  "food:want-apple": [
+    "Can I have an apple, please?",
+    "An apple, please.",
+    "I would like an apple, please."
+  ],
+  "food:want-banana": [
+    "Can I have a banana, please?",
+    "A banana, please.",
+    "I would like a banana, please."
+  ],
+  "numbers:please-1": [
+    "One apple, please.",
+    "I would like one apple, please."
+  ],
+  "numbers:please-2": [
+    "Two apples, please.",
+    "I would like two apples, please."
+  ],
+  "numbers:please-3": [
+    "Three apples, please.",
+    "I would like three apples, please."
+  ],
+  "numbers:please-4": [
+    "Four apples, please.",
+    "I would like four apples, please."
+  ],
+  "body:show-head": [
+    "This is my head.",
+    "It is my head."
+  ],
+  "body:show-nose": [
+    "This is my nose.",
+    "It is my nose."
+  ],
+  "body:show-hands": [
+    "These are my hands.",
+    "They are my hands."
+  ],
+  "body:show-feet": [
+    "These are my feet.",
+    "They are my feet."
+  ],
+  "family:who-mum": [
+    "This is my mum.",
+    "It is my mum.",
+    "It's my mum."
+  ],
+  "family:who-dad": [
+    "This is my dad.",
+    "It is my dad.",
+    "It's my dad."
+  ],
+  "family:who-grandma": [
+    "This is my grandma.",
+    "It is my grandma.",
+    "It's my grandma."
+  ],
+  "family:who-grandpa": [
+    "This is my grandpa.",
+    "It is my grandpa.",
+    "It's my grandpa."
+  ],
+  "clothes:need-hat": [
+    "I need my hat.",
+    "I need a hat."
+  ],
+  "clothes:need-coat": [
+    "I need my coat.",
+    "I need a coat."
+  ],
+  "clothes:need-shoes": [
+    "I need my shoes.",
+    "I need shoes."
+  ],
+  "clothes:need-gloves": [
+    "I need my gloves.",
+    "I need gloves."
+  ],
+  "house:go-kitchen": [
+    "Let's go to the kitchen.",
+    "We can go to the kitchen."
+  ],
+  "house:go-garden": [
+    "Let's go to the garden.",
+    "We can go to the garden."
+  ],
+  "house:see-chair": [
+    "I can see a chair.",
+    "There is a chair."
+  ],
+  "house:see-table": [
+    "I can see a table.",
+    "There is a table."
+  ],
+  "school:borrow-pencil": [
+    "Can I have a pencil, please?",
+    "I need a pencil, please.",
+    "A pencil, please."
+  ],
+  "school:borrow-book": [
+    "Can I have a book, please?",
+    "I need a book, please.",
+    "A book, please."
+  ],
+  "school:borrow-ruler": [
+    "Can I have a ruler, please?",
+    "I need a ruler, please.",
+    "A ruler, please."
+  ],
+  "school:borrow-bag": [
+    "Can I have a bag, please?",
+    "I need a bag, please.",
+    "A bag, please."
+  ],
+  "weather:today-sun": [
+    "It is sunny.",
+    "It's sunny."
+  ],
+  "weather:today-rain": [
+    "It is raining.",
+    "It's raining."
+  ],
+  "weather:today-snow": [
+    "It is snowing.",
+    "It's snowing."
+  ],
+  "weather:today-wind": [
+    "It is windy.",
+    "It's windy."
+  ],
+  "transport:travel-bus": [
+    "Let's go by bus.",
+    "We can go by bus.",
+    "I would like to go by bus."
+  ],
+  "transport:travel-train": [
+    "Let's go by train.",
+    "We can go by train.",
+    "I would like to go by train."
+  ],
+  "transport:travel-bike": [
+    "Let's go by bike.",
+    "We can go by bike.",
+    "I would like to go by bike."
+  ],
+  "transport:travel-boat": [
+    "Let's go by boat.",
+    "We can go by boat.",
+    "I would like to go by boat."
+  ],
+  "emotions:feel-happy": [
+    "I am happy.",
+    "I'm happy.",
+    "I feel happy."
+  ],
+  "emotions:feel-sad": [
+    "I am sad.",
+    "I'm sad.",
+    "I feel sad."
+  ],
+  "emotions:feel-tired": [
+    "I am tired.",
+    "I'm tired.",
+    "I feel tired."
+  ],
+  "emotions:feel-excited": [
+    "I am excited.",
+    "I'm excited.",
+    "I feel excited."
+  ],
+  "hello:name-lily": [
+    "My name is Lily.",
+    "I am Lily.",
+    "I'm Lily."
+  ],
+  "hello:name-tom": [
+    "My name is Tom.",
+    "I am Tom.",
+    "I'm Tom."
+  ],
+  "hello:greet": [
+    "Hello!",
+    "Hi!"
+  ],
+  "hello:bye": [
+    "Goodbye!",
+    "Bye!"
+  ],
+  "snack:apple": [
+    "Can I have an apple, please?",
+    "An apple, please."
+  ],
+  "snack:banana": [
+    "Can I have a banana, please?",
+    "A banana, please."
+  ],
+  "snack:water": [
+    "Can I have some water, please?",
+    "Some water, please."
+  ],
+  "snack:milk": [
+    "Can I have some milk, please?",
+    "Some milk, please."
+  ],
+  "playtime:ball": [
+    "Let's play with the ball.",
+    "We can play with the ball."
+  ],
+  "playtime:teddy": [
+    "Let's play with the teddy bear.",
+    "We can play with the teddy bear."
+  ],
+  "playtime:kite": [
+    "Let's fly the kite.",
+    "We can fly the kite."
+  ],
+  "playtime:blocks": [
+    "Let's play with the blocks.",
+    "We can play with the blocks."
+  ],
+  "classroom:pencil": [
+    "Can I have a pencil, please?",
+    "A pencil, please."
+  ],
+  "classroom:book": [
+    "Can I have a book, please?",
+    "A book, please."
+  ],
+  "classroom:ruler": [
+    "Can I have a ruler, please?",
+    "A ruler, please."
+  ],
+  "classroom:bag": [
+    "I am looking for my bag.",
+    "I'm looking for my bag."
+  ]
+}
