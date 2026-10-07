@@ -122,20 +122,17 @@ async function assessWithAzure(wavBuffer, expectedText, language) {
 
 async function assessEnglishSpeech(wavBuffer, expectedText, language) {
   const primary = await assessWithAzure(wavBuffer, expectedText, language);
-  // Keep a coherent assessment from one accepted English accent.
-  // Never combine the best individual phonemes from different assessments.
+  // British scores remain authoritative, matching the course reference audio.
+  // US is used only for named consonant diagnostics, never accent acceptance.
   if (primary.status === 'assessed' && primary.locale === 'en-GB') {
     const weakWords = primary.words.filter(w => w.accuracyScore < 80 || w.phonemes.some(p => p.accuracyScore !== null && p.accuracyScore < 75));
     if (weakWords.length) {
       try {
         const diagnostic = await assessWithAzure(wavBuffer, expectedText, 'en-US');
-        if (diagnostic.status === 'assessed' &&
-            !childFeedback({ score: 100 }, primary).passed && childFeedback({ score: 100 }, diagnostic).passed) {
-          return { ...diagnostic, diagnostics: { locale: primary.locale, words: primary.words, status: primary.status }, accentAlternative: true };
-        }
         primary.diagnostics = { locale: 'en-US', words: diagnostic.words, status: diagnostic.status };
         primary.issues = diagnostic.issues.filter(issue => weakWords.some(w => w.word.toLowerCase() === issue.word.toLowerCase()))
           // A final US R in e.g. water is not required in British pronunciation.
+          .filter(issue => !['vowel-practice', 'vowel-substitution'].includes(issue.type))
           .filter(issue => !(issue.type === 'r-practice' && /r$/i.test(issue.word) && !/^r/i.test(issue.word)))
           .map(issue => ({ ...issue, diagnosticLocale: 'en-US' }));
       } catch { primary.diagnostics = { locale: 'en-US', status: 'unavailable', words: [] }; }

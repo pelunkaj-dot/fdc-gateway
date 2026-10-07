@@ -168,7 +168,7 @@ test('Confirmed consonant substitution blocks acceptance despite strong aggregat
   assert.equal(childFeedback({ score: 100 }, p).passed, false);
 });
 
-test('A complete strong US assessment accepts a legitimate accent alternative', async () => {
+test('Strong US assessment never replaces the British pronunciation grade', async () => {
   const res = await request(loadHandler(async url => {
     if (url.includes('openai')) return Response.json({ text: 'dog' });
     const p = fixture('dog');
@@ -179,9 +179,10 @@ test('A complete strong US assessment accepts a legitimate accent alternative', 
     }
     return Response.json(p);
   }, env), { expectedText: 'dog', language: 'en-GB', phoneticAssessment: 'true' });
-  assert.equal(res.body.feedback.level, 'great');
-  assert.equal(res.body.pronunciation.locale, 'en-US');
-  assert.equal(res.body.pronunciation.accentAlternative, true);
+  assert.equal(res.body.feedback.passed, false);
+  assert.equal(res.body.pronunciation.locale, 'en-GB');
+  assert.equal(res.body.pronunciationScore, 80.8);
+  assert.equal(res.body.pronunciation.accentAlternative, undefined);
 });
 
 test('Exact Azure recognition plus strong phonemes can resolve isolated Whisper disagreement', async () => {

@@ -29,15 +29,15 @@ issues, optional diagnostics) and `feedback` (level, passed, title, tip).
 The existing `score` field is capped for weak phonemes, but is not the raw Azure
 score; use `pronunciationScore` for raw scores. Child UI displays no percentages.
 
-British English is the first assessment. Named phonemes and spoken-phoneme
-candidates are supported by Azure for en-US. A weak GB word requests a complete
-US assessment. If GB fails and the complete US result passes the same word,
-phoneme and miscue gates, use the coherent US result. Never mix best individual
-phonemes from different accents. If neither passes, keep GB scores and named
-US diagnostics. For an isolated word, a Whisper disagreement can be reconciled
-only by exact Azure recognized text AND a complete great phonetic result;
-reference text or high aggregates alone cannot override it. Preserve original
-Whisper transcript and disagreement score for diagnostics. Do not diagnose a
+British English is authoritative, matching the course reference audio. US scores
+never replace British scores or grant accent acceptance. Named phonemes and
+spoken-phoneme candidates are supported by Azure for en-US. A weak GB word
+can request secondary US consonant diagnostics. US vowel issues and optional
+word-final R are excluded because they can conflict with British pronunciation.
+For an isolated word, a Whisper disagreement can be reconciled only by exact
+Azure recognized text AND a complete great British phonetic result. Reference
+text or high aggregates alone cannot override it. Preserve original Whisper
+transcript and disagreement score for diagnostics. Do not diagnose a
 Czech trill from a low R score: it supports R practice advice, not proof of a
 trill. N-best substitution scores are model scores, not calibrated probabilities.
 US word-final R in e.g. water is not a British requirement.
@@ -78,7 +78,7 @@ script loaded without application JavaScript errors.
 synthetic OpenAI TTS samples, converted with ffmpeg to mono PCM16/16 kHz.
 These are service smoke tests, not validation on real children:
 
-Historical smoke results before the accent reconciliation fix:
+Historical smoke results with British authoritative scores:
 
 | Audio input | Expected | Azure PronScore | Outcome |
 | --- | --- | ---: | --- |
@@ -112,9 +112,8 @@ also verify provider-error fallback.
 
 Still unverified: detection of actual Czech trilled R, Czech vowel quality,
 all TH substitutions in human speech, real child calibration, and recording
-on physical mobile devices. The former rejection of good US TTS by British
-primary scores is addressed by coherent accent selection; verify live regression
-with correct dog/three and incorrect dock/tree after deployment. Do not describe these smoke tests
+on physical mobile devices. US TTS is not a positive acceptance criterion for this British course.
+Calibrate British thresholds using actual British recordings, not US grades. Do not describe these smoke tests
 as proof that all typical Czech errors are reliably detected. The recording
 UX was preserved in code (countdown, beep, speak cue, silence stop, assessing).
 The numbered checklist above remains the human/mobile acceptance checklist.
